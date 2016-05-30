@@ -1,0 +1,531 @@
+\documentclass{article}
+
+\usepackage{amssymb}
+\usepackage[intlimits]{amsmath}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{empheq}
+\usepackage{bbm}
+\usepackage{bm}
+\usepackage{fullpage}
+\usepackage{mathtools}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=blue,
+    filecolor=blue,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\usepackage{float}
+\restylefloat{table}
+
+\newcommand{\Prob}[1]{\ensuremath{\mathbb{P}\left[#1\right]}}
+\newcommand{\CondP}[2]{\ensuremath{\mathbb{P}\left[#1|#2\right]}}
+\newcommand{\Exp}[1]{\ensuremath{\mathbb{E}\left[#1\right]}}
+\newcommand{\Var}[1]{\ensuremath{\text{Var}\left[#1\right]}}
+\newcommand{\Std}[1]{\ensuremath{\text{Std}\left[#1\right]}}
+\newcommand{\CondE}[2]{\ensuremath{\mathbb{E}\left[#1|#2\right]}}
+\newcommand*\widefbox[1]{\fbox{\hspace{2em}#1\hspace{2em}}}
+\renewcommand{\(}{\left(}
+\renewcommand{\)}{\right)}
+
+\newcommand{\txtmathbf}[1]{\ensuremath{\text{\textbf{#1}}}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{claim}[theorem]{Claim}
+\newenvironment{proof}{{\bf Proof:}}{\hfill\rule{2mm}{2mm}}
+
+\newtheorem{definition}[theorem]{Definition}
+\let\olddefinition\definition
+\renewcommand{\definition}{\olddefinition\normalfont}
+
+\newtheorem{example}[theorem]{Example}
+\let\oldexample\example
+\renewcommand{\example}{\oldexample\normalfont}
+
+\renewcommand{\arraystretch}{1.5}
+
+\input{include/babarsym.tex}
+
+\title{Monte Carlo Usage}
+\author{Daniel Chao}
+\date{ } 
+
+\numberwithin{equation}{section}
+\begin{document}
+\maketitle 
+\tableofcontents 
+
+\section{Signal Monte Carlo}
+\subsection{Generated physics decays}
+Table \ref{sigmc_spmodes} shows SP mode codes and their corresponding physics decay processes. 
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ c c c }
+      SP mode & $B_{tag}$ & $B_{sig}$ \\
+      \hline\hline
+      11444 & $B^0\rightarrow D^{(*)+}\ell\nu$ & $B^0\rightarrow D^+\tau_h\nu$ \\
+      \hline
+      11445 & $B^0\rightarrow D^{(*)+}\ell\nu$ & $B^0\rightarrow D^{*+}\tau_h\nu$ \\
+      \hline
+      11446 & $B^+\rightarrow D^{(*)0}\ell\nu$ & $B^-\rightarrow D^{0}\tau_h\nu$ \\
+      \hline
+      11447 & $B^+\rightarrow D^{(*)0}\ell\nu$ & $B^-\rightarrow D^{*0}\tau_h\nu$ \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{(a) $\ell$ is either $e$ or $\mu$. (b) $D^{(*)}$ means both $D$ and $D^*$. (c) $\tau_h$ means tau subsequently decays to hadrons. (d) $B^0$ mixing is allowed. (e) The flavor of mesons are symbolic; anti-mesons not marked to avoid clutter.}
+  \label{sigmc_spmodes}
+\end{table}
+
+\subsubsection{Decay mode constraints}
+Intermediate particles generated are constrained to decay into one of the specified modes listed in the following tables. The columns are (1) decay mode, (2) true branching fraction taken from the PDG, (3) additional branching fraction needed to account for daughter decay constraints, and (4) branching fraction input into the generator. 
+
+Note that the branching fraction input into the generator is used for proportionality; since the generated particle can only decay into the specified modes, the generator uses these numbers to decide the relative abundance of each mode decayed into.
+
+See this \href{http://www.slac.stanford.edu/~manoni/BtoDtn/signalMC_update.pdf}{link} for more details.
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ l c c c }
+      Mode & $\mathcal{B}_{pdg}(\%)$ & $\mathcal{B}_{addl}(\%)$ & $\mathcal{B}_{gen}(\%)$ \\
+      \hline\hline
+      $K^0_S\rightarrow\pi^+\pi^-$ & 69.20 & - & 69.20 \\
+      \hline
+      Total & 69.20 & - & \textbf{69.20} \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{$K^0_S$ decay modes.}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ l c c c }
+      Mode & $\mathcal{B}_{pdg}(\%)$ & $\mathcal{B}_{addl}(\%)$ & $\mathcal{B}_{gen}(\%)$ \\
+      \hline\hline
+      $D^0\rightarrow K^-\pi^+$ & 3.88 & - & 3.88 \\
+      \hline
+      $D^0\rightarrow K^-\pi^+\pi^0$ & 13.90 & - & 13.90 \\
+      \hline
+      $D^0\rightarrow K^-\pi^+\pi^+\pi^-$ & 8.07 & - & 8.07 \\
+      \hline
+      $D^0\rightarrow K^0_S\pi^+\pi^-$ & 2.82 & 69.20 & 1.95 \\
+      \hline
+      $D^0\rightarrow K^0_S\pi^+\pi^-\pi^0$ & 5.2 & 69.20 & 3.60 \\
+      \hline
+      $D^0\rightarrow K^-\pi^+\pi^-\pi^+\pi^0$ & 4.2 & - & 4.2 \\
+      \hline
+      $D^0\rightarrow K^0_S\pi^0$ & 1.19 & 69.20 & 0.82 \\
+      \hline
+      $D^0\rightarrow K^-K^+$ & 0.4 & - & 0.4 \\
+      \hline
+      Total & 39.66 & - & \textbf{36.82} \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{$D^0$ decay modes. The scaling used throughout this table is the total generated branching fraction of the $K^0_S$ decay mode constraints.}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ l c c c }
+      Mode & $\mathcal{B}_{pdg}(\%)$ & $\mathcal{B}_{addl}(\%)$ & $\mathcal{B}_{gen}(\%)$ \\
+      \hline\hline
+      $D^+\rightarrow K^-\pi^+\pi^+$ & 9.13 & - & 9.13 \\
+      \hline
+      $D^+\rightarrow K^-\pi^+\pi^+\pi^0$ & 5.99 & - & 5.99 \\
+      \hline
+      $D^+\rightarrow K^0_S\pi^+$ & 1.47 & 69.20 & 1.02 \\
+      \hline
+      $D^+\rightarrow K^0_S\pi^+\pi^0$ & 6.99 & 69.20 & 4.84 \\
+      \hline
+      $D^+\rightarrow K^0_S\pi^+\pi^-\pi^+$ & 3.12 & 69.20 & 2.16 \\
+      \hline
+      $D^+\rightarrow K^0_S K^-$ & 0.283 & 69.20 & 0.2 \\
+      \hline
+      $D^+\rightarrow K^- K^+\pi^+$ & 0.96 & - & 0.96 \\
+      \hline
+      Total & 27.94 & - & \textbf{24.29} \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{$D^+$ decay modes. The scaling used throughout this table is the total generated branching fraction of the $K^0_S$ decay mode constraints.}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ l c c c }
+      Mode & $\mathcal{B}_{pdg}(\%)$ & $\mathcal{B}_{addl}(\%)$ & $\mathcal{B}_{gen}(\%)$ \\
+      \hline\hline
+      $D^{*0}\rightarrow D^0\pi^0$ & 61.90 & 36.82 & 22.79 \\
+      \hline
+      $D^{*0}\rightarrow D^0\gamma$ & 38.10 & 36.82 &  14.03 \\
+      \hline
+      Total & 100 & - & \textbf{36.82} \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{$D^{*0}$ decay modes. The scaling used throughout this table is the total generated branching fraction of the $D^0$ decay mode constraints.}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ l c c c }
+      Mode & $\mathcal{B}_{pdg}(\%)$ & $\mathcal{B}_{addl}(\%)$ & $\mathcal{B}_{gen}(\%)$ \\
+      \hline\hline
+      $D^{*+}\rightarrow D^0\pi^+$ & 67.70 & 36.82 & 24.93 \\
+      \hline
+      $D^{*+}\rightarrow D^+\pi^0$ & 30.70 & 24.30 & 7.46 \\
+      \hline
+      $D^{*+}\rightarrow D^+\gamma$ & 1.60 & 24.30 & 0.39 \\
+      \hline
+      Total & 100 & - & \textbf{32.78} \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{$D^{*+}$ decay modes. The scaling used throughout this table is the total generated branching fraction of either the $D^0$ or $D^+$ decay mode constraints.}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ l c c c }
+      Mode & $\mathcal{B}_{pdg}(\%)$ & $\mathcal{B}_{addl}(\%)$ & $\mathcal{B}_{gen}(\%)$ \\
+      \hline\hline
+      $\tau^+\rightarrow\pi^+\nu$ & 10.83 & - & 10.83 \\
+      \hline
+      $\tau^+\rightarrow\rho^+\nu$ & 25.52 & - & 25.52 \\
+      \hline
+      $\tau^+\rightarrow a_1^+\nu$ & 18.61 & - & 18.61 \\
+      \hline
+      $\tau^+\rightarrow K^+\nu$ & 0.7 & - & 0.7 \\
+      \hline
+      $\tau^+\rightarrow K^{*+}\nu$ & 0.85 & - & 0.85 \\
+      \hline
+      Total & 56.51 & - & \textbf{56.51} \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{$\tau^{+}$ decay modes.}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ l c c c }
+      Mode & $\mathcal{B}_{pdg}(\%)$ & $\mathcal{B}_{addl}(\%)$ & $\mathcal{B}_{gen}(\%)$ \\
+      \hline\hline
+      $B^0\rightarrow D^+\ell\nu$ & 2.18 & 24.29 & 0.53 \\
+      \hline
+      $B^0\rightarrow D^{*+}\ell\nu$ & 4.95 & 32.78 & 1.62 \\
+      \hline
+      $B^0\rightarrow D^{+}\tau\nu$ & 1.10 & 24.29 (13.72) & 0.27 (0.15) \\
+      \hline
+      $B^0\rightarrow D^{*+}\tau\nu$ & 1.50 & 32.78 (18.52) & 0.49 (0.28)\\
+      \hline
+      Total & 9.73 & - & \textbf{2.91} (2.58) \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{$B^{0}$ decay modes. The scaling used throughout this table is the total generated branching fraction of either the $D^+$ or $D^{*+}$ decay mode constraints. Additional scaling of the $\tau$ decay constraint is included in parentheses as these are not included in the generator, though still useful for event weighting later on. }
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ l c c c }
+      Mode & $\mathcal{B}_{pdg}(\%)$ & $\mathcal{B}_{addl}(\%)$ & $\mathcal{B}_{gen}(\%)$ \\
+      \hline\hline
+      $B^+\rightarrow D^0\ell\nu$ & 2.26 & 1 (36.82) & 2.26 (0.83) \\
+      \hline
+      $B^+\rightarrow D^{*0}\ell\nu$ & 5.70 & 1 (36.82) & 5.70 (2.10) \\
+      \hline
+      $B^+\rightarrow D^{0}\tau\nu$ & 0.77 & 1 (20.81) & 0.77 (0.16) \\
+      \hline
+      $B^+\rightarrow D^{*0}\tau\nu$ & 2.04 & 1 (20.81) & 2.04 (0.42) \\
+      \hline
+      Total & 10.77 & - & \textbf{10.77} (3.51) \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{$B^{+}$ decay modes. The actual generator decay branching fractions that are input has no scaling; this because they are all the same and don't affect the generated proportions. Nonetheless, the scaled branching fractions are provided in parentheses; this comes from the $D^+$, $D^{*+}$, $\tau^+$ decay constraints.}
+\end{table}
+
+\subsection{Generated event statistics}
+Table \ref{sigmc_generated} shows, for each SP mode, the number of events that have been generated and stored, as well as the number of events that are subsequently skimmed. 
+
+Define the number generated events to be $N_{store}$, and the number of events that are subsequently skimmed $N_{avail}$. The notation indicates that we only consider the $N_{avail}$ events as the ones that are availble for analysis; other events, though generated, are considered to be incompletely processed and are stored for future consumption. 
+
+Note the distinction between the number of events that are skimmed verses the number of events in the skim; events that are in the skim are events that are not only skimmed, but also pass the skim requirements and saved. The $N_{avail}$ events here are the number of events that are skimmed; only a subset of which are those that are saved in the skim.
+
+The ntuples that have been produced use all the $N_{avail}$ events. 
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ c c c c }
+      SP mode & $N_{store}$ & $N_{avail}$ & $f_{avail}$ \\
+      \hline\hline
+      11444 & 14,515,000 & 5,720,000 & 0.394 \\
+      \hline
+      11445 & 13,719,000 & 5,400,000 & 0.394 \\
+      \hline
+      11446 & 13,958,000 & 5,480,000 & 0.393 \\
+      \hline
+      11447 & 13,615,000 & 5,400,000 & 0.397 \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{$f_{avail}\coloneqq N_{avail}/N_{store}$}
+  \label{sigmc_generated}
+\end{table}
+
+See \verb!include/signalMC_data_usage.txt! as well as this \href{https://bbr-wiki.slac.stanford.edu/bbr_wiki/index.php/Physics_analysis/BtoDtaunu_SLtag/signalMCProd}{link} for more details.
+
+
+
+
+\subsection{Event weighting}
+\subsubsection{Branching fractions of restricted decays}
+Let $S^{(m)}_{tag|sig}$ be the set of all possible daughter decays specified for the $B_{tag|sig}$ meson in SP mode $m$. For example, $S^{(11444)}_{tag}$ specifies the set of possible $B_{tag}$ daughter decays for SP mode 11444. 
+
+In particular, we can compute the conditional probability that a specific $B$ meson decays into any arbitrary member of $S^{(m)}_{tag|sig}$, given that we have a properly flavored $B\overline{B}$ event. As an example, we compute the conditional probabilities for SP mode 11444. 
+
+\begin{example}
+  We would like to compute $\CondP{B\rightarrow S^{(11444)}_{tag} }{B^0\bar{B}^0}$ and $\CondP{B\rightarrow S^{(11444)}_{sig} }{B^0\bar{B}^0}$.
+  \begin{align}
+    \CondP{B\rightarrow S^{(11444)}_{tag} }{B^0\bar{B}^0} 
+    &= \Prob{B^0\rightarrow S^{(11444)}_{tag}} \\
+    &= \sum_{l=e,\mu}\Prob{B^0\rightarrow D^{(*)+}_{(11444)} l \nu} \\
+    &= 2 \Prob{B^0\rightarrow D^{(*)+}_{(11444)}\ell\nu} \\
+    &= 2 \(\Prob{B^0\rightarrow D^{+}_{(11444)}\ell\nu} + \Prob{B^0\rightarrow D^{*+}_{(11444)}\ell\nu}\) \\
+    &= 2 (0.0053 + 0.0162) \\
+    &= 0.043 \\
+    \CondP{B\rightarrow S^{(11444)}_{sig} }{B^0\bar{B}^0} 
+    &= \Prob{B^0\rightarrow S^{(11444)}_{sig}} \\
+    &= \Prob{B^0\rightarrow D^{+}_{(11444)}\tau\nu} \\
+    &= 0.0015
+  \end{align}
+  where $D_{(m)}$ means that the $D$ meson is restricted to decay into daughters specified in mode $m$.  
+\end{example}
+
+This computation is done for every combination, and the results are collected in Table \ref{b_to_s_prob}. 
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ c c c }
+      SP mode & $\Prob{B^{(m)}\rightarrow S^{(m)}_{tag}}$ & $\Prob{B^{(m)}\rightarrow S^{(m)}_{sig}}$ \\
+      \hline\hline
+      11444 & 0.043 & 0.0015 \\
+      \hline
+      11445 & 0.043 & 0.0028 \\
+      \hline
+      11446 & 0.059 & 0.0016 \\
+      \hline
+      11447 & 0.059 & 0.0042 \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{$\Prob{B^{(m)}\rightarrow S^{(m)}_{tag|sig}}$ for each combination. $B^{(m)}$ means that the $B$ meson flavor is that specified by mode $m$; for example, $B^{(11444)}$ is understood to be $B^0$ and $B^{(11446)}$ to be $B^+$.}  
+  \label{b_to_s_prob}
+\end{table}
+
+\subsubsection{Event probabilities of SP modes}
+We would like to compute the probability that a $B\bar{B}$ pair decays as some SP mode $m$; specifically, we would like to compute $\CondP{B\bar{B}\rightarrow m}{B\bar{B}}$, or just $\CondP{m}{B\bar{B}}$ for short:
+\begin{align}
+  \CondP{m}{B\bar{B}}
+  &=\CondP{\text{exactly 1 }B\rightarrow S^{(m)}_{tag} \cap \text{exactly 1 } B\rightarrow S^{(m)}_{sig}}{B\bar{B}} \\
+  &=2 \CondP{B_1\rightarrow S^{(m)}_{tag} \cap B_2\rightarrow S^{(m)}_{sig}}{B\bar{B}} \\
+  &=\CondP{B^{(m)}_1\rightarrow S^{(m)}_{tag} \cap B^{(m)}_2\rightarrow S^{(m)}_{sig}}{B^{(m)}\bar{B}^{(m)}} \\
+  &=\CondP{B^{(m)}_1\rightarrow S^{(m)}_{tag}}{B^{(m)}\bar{B}^{(m)}} \CondP{B^{(m)}_2\rightarrow S^{(m)}_{sig}}{B^{(m)}\bar{B}^{(m)}} \\
+  &=\Prob{B^{(m)}\rightarrow S^{(m)}_{tag}} \Prob{B^{(m)}\rightarrow S^{(m)}_{sig}}
+\end{align}
+where $B_{1,2}$ means the first or second $B$ meson under an arbitrary fixed ordering, and $B^{(m)}$ is $B^{+,0}$ depending on mode $m$.
+
+Now we can use the results from table \ref{b_to_s_prob} to compute $\CondP{m}{B\bar{B}}$ for each SP mode. We collect the results in table \ref{spmode_prob}. 
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ c c }
+      SP mode $m$ & $\CondP{m}{B\bar{B}}$ \\
+      \hline\hline
+      11444 & $6.45\times 10^{-5}$ \\
+      \hline
+      11445 & $12.04\times 10^{-5}$ \\
+      \hline
+      11446 & $9.44\times 10^{-5}$ \\
+      \hline
+      11447 & $24.78\times 10^{-5}$ \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{Event probabilities for each SP mode given a $B\bar{B}$ event.}
+  \label{spmode_prob}
+\end{table}
+
+\subsubsection{Event weights}
+We would like to use all $N_{avail}$ events to perform analysis. 
+
+Define $w^{(m)}$ to be the weight of an event from SP mode $m$:
+\begin{equation}
+  N_{B\bar{B}}\CondP{m}{B\bar{B}}=w^{(m)} N^{(m)}_{avail}
+\end{equation}
+where $N_{B\bar{B}}$ is the expected number of $B\bar{B}$ events in the $\babar$ dataset, and $N^{(m)}_{avail}$ is the number of available events for mode $m$ listed in table \ref{sigmc_generated}. 
+
+We list the weights in table \ref{sigmc_weights}.
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ c c }
+      SP mode $m$ & $w^{(m)}$ \\
+      \hline\hline
+      11444 & 0.00531115 \\ 
+      \hline
+      11445 & 0.01050165 \\
+      \hline
+      11446 & 0.00811365 \\
+      \hline
+      11447 & 0.02161385 \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{Event weights for each SP mode. Take $N_{B\bar{B}}$ to be 471,004,102.}
+  \label{sigmc_weights}
+\end{table}
+
+Note that this is independent of the run number, since we ensure that the proportions between them are correct in $N_{avail}$ (the proportions also assumed to be correct in $N_{store}$).
+
+Sometimes we would only consider a subset of the $N_{avail}$ events for specific studies. In this case, let the fraction of events we consider among the $N_{avail}$ to be $f$. In this case, the modified weights would be 
+\begin{equation}
+  w^{(m)}(f) = \frac{w^{(m)}}{f}
+\end{equation}
+
+\subsection{Machine learning samples}
+Each event is uniquely idenfied with an event ID string:
+\begin{equation}
+  \text{event ID} = ``\{platform\}:\{partition\}:\{upperID\}/\{lowerID\}"
+\end{equation}
+where the brackets and its enclosed contents are to be substituted with the value of the enclosed quanity.
+
+Every event in the ntuple is randomly assigned to 1 of 4 machine learning samples:
+\begin{itemize}
+  \item explore: These are for data exploration purposes. One is free to examine any feature and characteristic of this data sample. 
+  \item train: This is the training sample used for machine learning. 
+  \item validate: This is the validation sample used for machine learning. 
+  \item test: This is the test sample used for machine learning. 
+\end{itemize}
+
+The proportion between the different samples is 
+\begin{equation}
+  \text{explore}:\text{train}:\text{validate}:\text{test}=2.64 : 3 : 1 : 1
+\end{equation}
+
+All events are also subdivided into $10$ divisions. One can use this partitioning to conserve clean data.
+
+\newpage
+
+\section{Generic Monte Carlo}
+\subsection{Dataset description}
+The $\babar$ on-peak dataset is split up into 6 run periods. This data is available to our analysis as ``AllEventsSkim-Run$\{r\}$-OnPeak-R24a1-v03''. In other words, the union of events across these 6 datasets is all the data that $\babar$ has collected, on which we perform our measurement. To find out how much data is in a particular dataset, say run 3 for example, use the command: 
+\begin{verbatim}
+lumi --dataset AllEventsSkim-Run3-OnPeak-R24a1-v03 --dbname=bbkr24
+\end{verbatim}
+
+The physics origin of $\babar$ events is shown in table \ref{xsec_raw}.
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ c c }
+      $e^+e^-\rightarrow$ & $\sigma\text{ (nb)}$ \\
+      \hline\hline
+      $b\bar{b}$ & 1.05 \\
+      \hline
+      $c\bar{c}$ & 1.30 \\
+      \hline
+      $s\bar{s}$ & 0.35 \\
+      \hline
+      $u\bar{u}$ & 1.39 \\
+      \hline
+      $d\bar{d}$ & 0.35 \\
+      \hline
+      $\tau^+\tau^-$ & 0.94 \\
+      \hline
+      $\mu^+\mu^-$ & 1.16 \\
+      \hline
+      $e^+e^-$ & $\sim 40$ \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{Physics origin of general $\babar$ events}
+  \label{xsec_raw}
+\end{table}
+
+However, the physics origin of events that make it to our analysis is effectvely those shown in table \ref{xsec}. Notice that $e^+e^-\rightarrow e^+e^-,\mu^+\mu^-$ events have already been identified and eliminated, and $b\bar{b}$ events are effectively either $B^0\bar{B}^0$ or $B^+B^-$ events with equal proportions. 
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{ c c c }
+      $e^+e^-\rightarrow$ & $\sigma\text{ (pb)}$ & SP mode \\
+      \hline\hline
+      $B^0\bar{B}^0$ & 525.0 & 1237 \\
+      \hline
+      $B^+B^-$ & 525.0 & 1235 \\
+      \hline
+      $u\bar{u},\,d\bar{d}\,,s\bar{s}$ & 2090.0 & 998 \\
+      \hline
+      $c\bar{c}$ & 1300.0 & 1005 \\
+      \hline
+      $\tau^+\tau^-$ & 940.0 & 3429 \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \caption{Physics origin of $\babar$ events available to our analyses.}
+  \label{xsec}
+\end{table}
+
+The generic Monte Carlo is separately generated for each physics origin category, and for each run period. To see the number of events generated for a given SP mode and a given run period, say mode 1237 and run 3, use the command
+\begin{verbatim}
+BbkUser --dbname=bbkr24 
+        --dataset=SP-1237-AllEventsSkim-Run3-R24a1-v03 
+        dataset events --summary
+\end{verbatim}
+
+\subsection{Event weighting}
+We would like to use all the generated generic events to perform analyses.
+
+Let $N^{data}_{rm}$ be the number of events in run $r$ of the $\babar$ dataset whose physics origin is mode $m$. Also let $\mathcal{L}_r$ be the luminosity of run $r$ in the $\babar$ dataset and $\sigma_m$ be the cross section of mode $m$. 
+
+Let $N^{MC}_{rm}$ be the number of events in the generic Monte Carlo that is generated for mode $m$ and run $r$. We define $w_{rm}$ as the weight of such a Monte carlo event as follows:
+\begin{align}
+  & w_{rm}N^{MC}_{rm}=N^{data}_{rm} \\
+  \Rightarrow\;& w_{rm} = \frac{\mathcal{L}_r\sigma_m}{N^{MC}_{rm}}
+\end{align}
+
+\begin{example}
+  As a concrete example, let's compute $w_{rm}$ with for $r=3$ and $m=1237$. Running the \verb!lumi! command above, we get $\mathcal{L}_r=32277.624\,\text{pb$^{-1}$}$. Running the \verb!BbkUser! command above, we get $N^{MC}_{rm}=\text{57,888,000}$. Plugging in the $\sigma_m$ from table \ref{xsec}, we get $w_{rm}=0.2927$.
+\end{example}
+
+See \verb!include/get_generic_weights.py! for a script to generate all weights. 
+
+\subsection{Machine learning samples}
+Each event is uniquely idenfied with an event ID string:
+\begin{equation}
+  \text{event ID} = ``\{platform\}:\{partition\}:\{upperID\}/\{lowerID\}"
+\end{equation}
+where the brackets and its enclosed contents are to be substituted with the value of the enclosed quanity.
+
+Every event in the ntuple is randomly assigned to 1 of 5 machine learning samples:
+\begin{itemize}
+  \item explore: These are for data exploration purposes. One is free to examine any feature and characteristic of this data sample. 
+  \item train: This is the training sample used for machine learning. 
+  \item validate: This is the validation sample used for machine learning. 
+  \item test: This is the test sample used for machine learning. 
+  \item unassigned: These are events that have not been assigned a sample. They will remain untouched until their purposes are assigned. 
+\end{itemize}
+
+The proportion between the assigned samples are 
+\begin{equation}
+  \text{explore}:\text{train}:\text{validate}:\text{test}= 1 : 1.1 : 1 : 1
+\end{equation}
+
+All events are also subdivided into $10$ divisions. One can use this partitioning to conserve clean data.
+
+\end{document}
