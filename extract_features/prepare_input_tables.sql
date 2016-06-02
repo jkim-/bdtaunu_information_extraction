@@ -1,4 +1,4 @@
-CREATE MATERIALIZED VIEW feature_extraction_input AS 
+CREATE TABLE feature_extraction_input_sigmc AS 
 SELECT
   eid, 
   reco_n_vertices,
@@ -14,4 +14,6 @@ SELECT
   l_reco_idx,
   gamma_reco_idx
 FROM 
-  framework_ntuples_sp1235 INNER JOIN graph_sp1235 using (eid);
+  framework_ntuples INNER JOIN graph_sigmc using (eid);
+
+CREATE INDEX ON feature_extraction_input_sigmc (eid);
