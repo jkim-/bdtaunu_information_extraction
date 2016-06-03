@@ -6,7 +6,7 @@
 class RecoFeatureExtractor {
 
   public:
-    struct InternalVertexProperties {
+    struct VertexProperties {
       int idx_;
       int lund_id_;
       int local_idx_;
@@ -14,13 +14,13 @@ class RecoFeatureExtractor {
 
     using Graph = boost::adjacency_list<
       boost::vecS, boost::vecS,
-      boost::bidirectionalS, InternalVertexProperties>;
+      boost::bidirectionalS, VertexProperties>;
 
     using Vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
     using VertexIter = typename boost::graph_traits<Graph>::vertex_iterator;
 
     using IntPropertyMap = boost::property_map<
-      Graph, int InternalVertexProperties::*>::type;
+      Graph, int VertexProperties::*>::type;
 
   public:
     RecoFeatureExtractor();
@@ -60,17 +60,17 @@ RecoFeatureExtractor::get_graph() const { return g_; }
 
 inline RecoFeatureExtractor::IntPropertyMap 
 RecoFeatureExtractor::get_idx_pm() {
-  return get(&InternalVertexProperties::idx_, g_);
+  return get(&VertexProperties::idx_, g_);
 }
 
 inline RecoFeatureExtractor::IntPropertyMap 
 RecoFeatureExtractor::get_lund_id_pm() {
-  return get(&InternalVertexProperties::lund_id_, g_);
+  return get(&VertexProperties::lund_id_, g_);
 }
 
 inline RecoFeatureExtractor::IntPropertyMap 
 RecoFeatureExtractor::get_local_idx_pm() {
-  return get(&InternalVertexProperties::local_idx_, g_);
+  return get(&VertexProperties::local_idx_, g_);
 }
 
 #endif
