@@ -23,7 +23,8 @@ int main() {
         "reco_from_vertices", "reco_to_vertices", "reco_lund_id", 
         "y_reco_idx", "b_reco_idx", "d_reco_idx", "c_reco_idx", 
         "h_reco_idx", "l_reco_idx", "gamma_reco_idx", 
-        "ltrkidx", "htrkidx", "eselectorsmap", "muselectorsmap" }, 
+        "ltrkidx", "htrkidx", "eselectorsmap", "muselectorsmap",
+        "dmass"}, 
         cursor_fetch_size);
 
   int eid;
@@ -32,6 +33,7 @@ int main() {
   std::vector<int> y_reco_idx, b_reco_idx, d_reco_idx, c_reco_idx;
   std::vector<int> h_reco_idx, l_reco_idx, gamma_reco_idx;
   std::vector<int> ltrkidx, htrkidx, eselectorsmap, muselectorsmap;
+  std::vector<float> dmass;
 
   psql.next();
 
@@ -53,6 +55,7 @@ int main() {
   pgstring_convert(psql.get("htrkidx"), htrkidx);
   pgstring_convert(psql.get("eselectorsmap"), eselectorsmap);
   pgstring_convert(psql.get("muselectorsmap"), muselectorsmap);
+  pgstring_convert(psql.get("dmass"), dmass);
 
   // extract features
   RecoFeatureExtractor extractor;
@@ -60,7 +63,8 @@ int main() {
                      reco_from_vertices, reco_to_vertices, reco_lund_id,
                      y_reco_idx, b_reco_idx, d_reco_idx, c_reco_idx,
                      h_reco_idx, l_reco_idx, gamma_reco_idx, 
-                     ltrkidx, htrkidx, eselectorsmap, muselectorsmap);
+                     ltrkidx, htrkidx, eselectorsmap, muselectorsmap, 
+                     dmass);
 
   std::cout << eid << std::endl;
   std::cout << vector2pgstring(extractor.get_l_epid()) << ",";
@@ -68,6 +72,12 @@ int main() {
   std::cout << std::endl;
   std::cout << vector2pgstring(extractor.get_h_epid()) << ",";
   std::cout << vector2pgstring(extractor.get_h_mupid()) << ",";
+  std::cout << std::endl;
+  std::cout << vector2pgstring(dmass) << ",";
+  std::cout << vector2pgstring(extractor.get_dmeson_mass()) << ",";
+  std::cout << std::endl;
+  std::cout << vector2pgstring(extractor.get_dmeson_mode()) << ",";
+  std::cout << vector2pgstring(extractor.get_dstar_mode()) << ",";
   std::cout << std::endl;
 
   std::ofstream fout("test.gv");

@@ -1,9 +1,26 @@
 #include "RecoFeatureExtractor.h"
-#include "RecoDmodeCatalogue.h"
 
-RecoFeatureExtractor::RecoFeatureExtractor() {}
+const int D0Lund = 421;        
+const int DcLund = 411;
+const int Dstar0Lund = 423;
+const int DstarcLund = 413;
+
+RecoFeatureExtractor::RecoFeatureExtractor() 
+  : d_catalogue_() { clear_cache(); }
 
 RecoFeatureExtractor::~RecoFeatureExtractor() {}
+
+void RecoFeatureExtractor::clear_cache() {
+  g_.clear();
+  idx2vtx_.clear();
+  l_epid_.clear();
+  l_mupid_.clear();
+  h_epid_.clear();
+  l_mupid_.clear();
+  dmeson_mass_.clear();
+  dmeson_mode_.clear();
+  dstar_mode_.clear();
+}
 
 void RecoFeatureExtractor::set_data(
     int n_vertices, int n_edges, 
@@ -22,19 +39,131 @@ void RecoFeatureExtractor::set_data(
     const std::vector<int> &ltrkidx, 
     const std::vector<int> &htrkidx, 
     const std::vector<int> &eselectorsmap, 
-    const std::vector<int> &muselectorsmap) {
+    const std::vector<int> &muselectorsmap, 
+    
+    const std::vector<float> &dmass 
+    ) {
   
 
   clear_cache();
 
-  construct_graph(g_, n_vertices, n_edges, from_vertices, to_vertices);
+  construct_graph(g_, idx2vtx_, n_vertices, n_edges, from_vertices, to_vertices);
   populate_lund_id(g_, lund_id);
   populate_local_idx(g_, 
       { y_reco_idx, b_reco_idx, d_reco_idx, c_reco_idx, 
         h_reco_idx, l_reco_idx, gamma_reco_idx });
 
   extract_pid(ltrkidx, htrkidx, eselectorsmap, muselectorsmap);
+  extract_dmeson_mass(d_reco_idx, dmass);
+  extract_d_modes(d_reco_idx);
 
+}
+
+void RecoFeatureExtractor::cache_is_dstar(
+    const std::vector<int> &d_reco_idx, 
+    std::vector<int> &is_dstar) {
+
+  is_dstar = std::vector<int>(d_reco_idx.size(), 0);
+  for (int i = 0; i < d_reco_idx.size(); ++i) {
+    int d_abslund = abs(g_[idx2vtx_[d_reco_idx[i]]].lund_id_);
+    if (d_abslund == DstarcLund || d_abslund == Dstar0Lund) { 
+      is_dstar[i] = 1; 
+    }
+  }
+}
+
+void RecoFeatureExtractor::assemble_decay_string(
+    int reco_idx, 
+    std::vector<int> &lund_list) {
+
+  lund_list.clear();
+
+  // store mother lund
+  Vertex u = idx2vtx_[reco_idx];
+  lund_list.push_back(g_[u].lund_id_);
+
+  // store daughter lund
+  OutEdgeIter oe, oe_end;
+  for (std::tie(oe, oe_end) = out_edges(u, g_); oe != oe_end; ++oe) {
+    lund_list.push_back(g_[target(*oe, g_)].lund_id_);
+  }
+}
+
+void RecoFeatureExtractor::extract_d_modes(
+    const std::vector<int> &d_reco_idx) {
+
+  std::vector<int> is_dstar; cache_is_dstar(d_reco_idx, is_dstar);
+
+  dmeson_mode_ = std::vector<int>(d_reco_idx.size(), -1);
+  dstar_mode_ = std::vector<int>(d_reco_idx.size(), -1);
+
+  std::vector<int> lund_list;
+  for (int i = 0; i < d_reco_idx.size(); ++i) {
+
+    assemble_decay_string(d_reco_idx[i], lund_list);
+
+    if (!is_dstar[i]) { 
+      dmeson_mode_[i] = d_catalogue_.get_d_mode(lund_list);
+    } else {
+      dstar_mode_[i] = d_catalogue_.get_dstar_mode(lund_list);
+    }
+  }
+
+  for (int i = 0; i < d_reco_idx.size(); ++i) {
+    if (is_dstar[i]) {
+
+      Vertex u = idx2vtx_[d_reco_idx[i]];
+      OutEdgeIter oe, oe_end;
+      for (std::tie(oe, oe_end) = out_edges(u, g_); oe != oe_end; ++oe) {
+
+        Vertex v = target(*oe, g_);
+        int dau_abslund = abs(g_[v].lund_id_);
+        if (dau_abslund == D0Lund || dau_abslund == DcLund) {
+          dmeson_mode_[i] = dmeson_mode_[g_[v].local_idx_];
+        }
+
+      }
+    }
+  }
+
+  return;
+}
+
+void RecoFeatureExtractor::extract_dmeson_mass(
+    const std::vector<int> &d_reco_idx,
+    const std::vector<float> &dmass) {
+
+  assert(d_reco_idx.size() == dmass.size());
+
+  std::vector<int> is_dstar(d_reco_idx.size(), 0);
+  for (int i = 0; i < d_reco_idx.size(); ++i) {
+    int d_abslund = abs(g_[idx2vtx_[d_reco_idx[i]]].lund_id_);
+    if (d_abslund == DstarcLund || d_abslund == Dstar0Lund) { is_dstar[i] = 1; }
+  }
+
+  dmeson_mass_ = std::vector<float>(d_reco_idx.size(), -1);
+  for (int i = 0; i < dmass.size(); ++i) {
+    if (!is_dstar[i]) { dmeson_mass_[i] = dmass[i]; }
+  }
+
+  for (int i = 0; i < dmass.size(); ++i) {
+    if (is_dstar[i]) { 
+
+      Vertex u = idx2vtx_[d_reco_idx[i]];
+      OutEdgeIter oe, oe_end;
+      for (std::tie(oe, oe_end) = out_edges(u, g_); oe != oe_end; ++oe) {
+
+        Vertex v = target(*oe, g_);
+        int dau_abslund = abs(g_[v].lund_id_);
+        if (dau_abslund == D0Lund || dau_abslund == DcLund) {
+          dmeson_mass_[i] = dmeson_mass_[g_[v].local_idx_];
+        }
+
+      }
+    }
+  }
+
+  return;
 }
 
 // Level 0: pass no electron KM selectors. 
@@ -97,15 +226,8 @@ void RecoFeatureExtractor::extract_pid(
 }
 
 
-void RecoFeatureExtractor::clear_cache() {
-  g_.clear();
-  l_epid_.clear();
-  l_mupid_.clear();
-  h_epid_.clear();
-  l_mupid_.clear();
-}
-
-void RecoFeatureExtractor::construct_graph(Graph &g, 
+void RecoFeatureExtractor::construct_graph(
+    Graph &g, std::vector<Vertex> &idx2vtx,
     int n_vertices, int n_edges,
     const std::vector<int> &from_vertices, 
     const std::vector<int> &to_vertices) {
@@ -127,6 +249,7 @@ void RecoFeatureExtractor::construct_graph(Graph &g,
 
   // clear the graph 
   g.clear();
+  idx2vtx.clear();
 
   // establish a mapping between vertex index and vertex descriptors
   std::vector<Vertex> vertex_map(n_vertices);
@@ -137,12 +260,15 @@ void RecoFeatureExtractor::construct_graph(Graph &g,
     vertex_map[i] = u;
     g[u].idx_ = i;
   }
+  idx2vtx = vertex_map;
 
   // insert edges
   for (int i = 0; i < n_edges; ++i) {
     boost::add_edge(vertex_map[from_vertices[i]], 
                     vertex_map[to_vertices[i]], g);
   }
+
+
 }
 
 void RecoFeatureExtractor::populate_lund_id(Graph &g,

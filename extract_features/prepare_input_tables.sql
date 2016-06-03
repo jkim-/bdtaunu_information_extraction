@@ -16,7 +16,8 @@ SELECT
   ltrkidx, 
   htrkidx,
   eselectorsmap, 
-  muselectorsmap 
+  muselectorsmap, 
+  dmass
 FROM 
   framework_ntuples INNER JOIN graph_sigmc using (eid);
 
