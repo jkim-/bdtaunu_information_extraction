@@ -1,4 +1,5 @@
 #include "RecoFeatureExtractor.h"
+#include "RecoDmodeCatalogue.h"
 
 RecoFeatureExtractor::RecoFeatureExtractor() {}
 
@@ -9,19 +10,99 @@ void RecoFeatureExtractor::set_data(
     const std::vector<int> &from_vertices, 
     const std::vector<int> &to_vertices, 
     const std::vector<int> &lund_id, 
-    const std::vector<std::vector<int>> &global_indices) {
+
+    const std::vector<int> &y_reco_idx,
+    const std::vector<int> &b_reco_idx,
+    const std::vector<int> &d_reco_idx,
+    const std::vector<int> &c_reco_idx,
+    const std::vector<int> &h_reco_idx,
+    const std::vector<int> &l_reco_idx,
+    const std::vector<int> &gamma_reco_idx,
+
+    const std::vector<int> &ltrkidx, 
+    const std::vector<int> &htrkidx, 
+    const std::vector<int> &eselectorsmap, 
+    const std::vector<int> &muselectorsmap) {
+  
 
   clear_cache();
 
   construct_graph(g_, n_vertices, n_edges, from_vertices, to_vertices);
   populate_lund_id(g_, lund_id);
-  populate_local_idx(g_, global_indices);
+  populate_local_idx(g_, 
+      { y_reco_idx, b_reco_idx, d_reco_idx, c_reco_idx, 
+        h_reco_idx, l_reco_idx, gamma_reco_idx });
+
+  extract_pid(ltrkidx, htrkidx, eselectorsmap, muselectorsmap);
+
+}
+
+// Level 0: pass no electron KM selectors. 
+// Levels 1-6: the higher the more electron KM selectors passed. 
+int deduce_epid_levels(int epid_bitmap) {
+
+  int epid_level = 0;
+
+  // + 6 is the offset for the first eKM selector. 
+  // + cycle through 6 levels:
+  //   SuperLoose, VeryLoose, Loose, Tight, VeryTight, SuperTight. 
+  for (unsigned i = 0; i <= 5; ++i) {
+    epid_level += (epid_bitmap >> (6 + i)) & 0x1;
+  }
+
+  return epid_level;
+}
+
+// Level 0: pass no muon bdt fake rate selectors. 
+// Levels 1-4: the higher the more muon bdt fake rate selectors passed. 
+int deduce_mupid_levels(int mupid_bitmap) {
+
+  int mupid_level = 0;
+
+  // + 20 is the offset for the first muBDTFakeRate selector. 
+  // + cycle through 4 levels:
+  //   VeryLoose, Loose, Tight, VeryTight. 
+  for (unsigned i = 0; i <= 3; ++i) {
+    mupid_level += (mupid_bitmap >> (20 + i)) & 0x1;
+  }
+
+  return mupid_level;
+}
+
+// epid: -1 for missing value, 0-6 for others. 
+// mupid: -1 for missing value, 0-4 for others. 
+void RecoFeatureExtractor::extract_pid(
+    const std::vector<int> &ltrkidx, const std::vector<int> &htrkidx, 
+    const std::vector<int> &eselectorsmap, 
+    const std::vector<int> &muselectorsmap) {
+
+  l_epid_ = std::vector<int>(ltrkidx.size(), -1);
+  l_mupid_ = std::vector<int>(ltrkidx.size(), -1);
+  for (size_t i = 0; i < ltrkidx.size(); ++i) {
+    if (ltrkidx[i] >= 0) {
+      l_epid_[i] = deduce_epid_levels(eselectorsmap[ltrkidx[i]]);
+      l_mupid_[i] = deduce_mupid_levels(muselectorsmap[ltrkidx[i]]);
+    }
+  }
+
+  h_epid_ = std::vector<int>(htrkidx.size(), -1);
+  h_mupid_ = std::vector<int>(htrkidx.size(), -1);
+  for (size_t i = 0; i < htrkidx.size(); ++i) {
+    if (htrkidx[i] >= 0) {
+      h_epid_[i] = deduce_epid_levels(eselectorsmap[htrkidx[i]]);
+      h_mupid_[i] = deduce_mupid_levels(muselectorsmap[htrkidx[i]]);
+    }
+  }
 
 }
 
 
 void RecoFeatureExtractor::clear_cache() {
   g_.clear();
+  l_epid_.clear();
+  l_mupid_.clear();
+  h_epid_.clear();
+  l_mupid_.clear();
 }
 
 void RecoFeatureExtractor::construct_graph(Graph &g, 

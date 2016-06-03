@@ -1,5 +1,5 @@
 BINARIES = test2
-OBJECTS = RecoFeatureExtractor.o
+OBJECTS = RecoFeatureExtractor.o RecoDmodeCatalogue.o
 
 BDTAUNU_INFO_EXTRACT_ROOT = /Users/dchao/workspace/bdtaunu_information_extraction
 UTILS_ROOT = $(BDTAUNU_INFO_EXTRACT_ROOT)/utils

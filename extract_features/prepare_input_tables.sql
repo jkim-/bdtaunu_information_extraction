@@ -12,7 +12,11 @@ SELECT
   c_reco_idx,
   h_reco_idx,
   l_reco_idx,
-  gamma_reco_idx
+  gamma_reco_idx, 
+  ltrkidx, 
+  htrkidx,
+  eselectorsmap, 
+  muselectorsmap 
 FROM 
   framework_ntuples INNER JOIN graph_sigmc using (eid);
 

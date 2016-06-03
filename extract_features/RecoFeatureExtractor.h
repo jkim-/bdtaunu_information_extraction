@@ -30,7 +30,25 @@ class RecoFeatureExtractor {
                   const std::vector<int> &from_vertices, 
                   const std::vector<int> &to_vertices, 
                   const std::vector<int> &lund_id, 
-                  const std::vector<std::vector<int>> &global_indices);
+
+                  const std::vector<int> &y_reco_idx,
+                  const std::vector<int> &b_reco_idx,
+                  const std::vector<int> &d_reco_idx,
+                  const std::vector<int> &c_reco_idx,
+                  const std::vector<int> &h_reco_idx,
+                  const std::vector<int> &l_reco_idx,
+                  const std::vector<int> &gamma_reco_idx,
+
+                  const std::vector<int> &ltrkidx, 
+                  const std::vector<int> &htrkidx, 
+                  const std::vector<int> &eselectorsmap, 
+                  const std::vector<int> &muselectorsmap, 
+                  );
+
+    const std::vector<int>& get_l_epid() const { return l_epid_; }
+    const std::vector<int>& get_l_mupid() const { return l_mupid_; }
+    const std::vector<int>& get_h_epid() const { return h_epid_; }
+    const std::vector<int>& get_h_mupid() const { return h_mupid_; }
 
     Graph get_graph() const;
     IntPropertyMap get_idx_pm();
@@ -51,8 +69,15 @@ class RecoFeatureExtractor {
     void populate_local_idx(Graph &g,
         const std::vector<std::vector<int>> &global_indices);
 
+    void extract_pid(
+        const std::vector<int> &ltrkidx, const std::vector<int> &htrkidx, 
+        const std::vector<int> &eselectorsmap, 
+        const std::vector<int> &muselectorsmap);
+
   private:
     Graph g_;
+    std::vector<int> l_epid_, l_mupid_;
+    std::vector<int> h_epid_, h_mupid_;
 };
 
 inline RecoFeatureExtractor::Graph 
