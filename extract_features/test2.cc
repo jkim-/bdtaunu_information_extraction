@@ -36,6 +36,9 @@ int main() {
   std::vector<float> dmass;
 
   psql.next();
+  psql.next();
+  psql.next();
+  psql.next();
 
   // load record information
   pgstring_convert(psql.get("eid"), eid);
@@ -66,26 +69,42 @@ int main() {
                      ltrkidx, htrkidx, eselectorsmap, muselectorsmap, 
                      dmass);
 
-  std::cout << eid << std::endl;
-  std::cout << vector2pgstring(extractor.get_l_epid()) << ",";
-  std::cout << vector2pgstring(extractor.get_l_mupid()) << ",";
+  std::cout << "lepid, lmupid: " << std::endl;
+  std::cout << vector2pgstring(extractor.get_l_epid()) << std::endl;
+  std::cout << vector2pgstring(extractor.get_l_mupid()) << std::endl;
   std::cout << std::endl;
-  std::cout << vector2pgstring(extractor.get_h_epid()) << ",";
-  std::cout << vector2pgstring(extractor.get_h_mupid()) << ",";
+
+  std::cout << "hepid, hmupid: " << std::endl;
+  std::cout << vector2pgstring(extractor.get_h_epid()) << std::endl;
+  std::cout << vector2pgstring(extractor.get_h_mupid()) << std::endl;
   std::cout << std::endl;
-  std::cout << vector2pgstring(dmass) << ",";
-  std::cout << vector2pgstring(extractor.get_d_dmass()) << ",";
+
+  std::cout << "d is dstar: " << std::endl;
+  std::cout << vector2pgstring(extractor.get_d_is_dstar()) << std::endl;
   std::cout << std::endl;
-  std::cout << vector2pgstring(extractor.get_d_dmode()) << ",";
-  std::cout << vector2pgstring(extractor.get_d_dstarmode()) << ",";
+
+  std::cout << "raw dmass, d_dmass: " << std::endl;
+  std::cout << vector2pgstring(dmass) << std::endl;
+  std::cout << vector2pgstring(extractor.get_d_dmass()) << std::endl;
   std::cout << std::endl;
-  std::cout << vector2pgstring(extractor.get_b_is_tag()) << ",";
+
+  std::cout << "d mode, dstar mode: " << std::endl;
+  std::cout << vector2pgstring(extractor.get_d_dmode()) << std::endl;
+  std::cout << vector2pgstring(extractor.get_d_dstarmode()) << std::endl;
   std::cout << std::endl;
-  std::cout << vector2pgstring(extractor.get_b_d_idx()) << ",";
-  std::cout << vector2pgstring(extractor.get_b_lh_idx()) << ",";
+
+  std::cout << "b is tag: " << std::endl;
+  std::cout << vector2pgstring(extractor.get_b_is_tag()) << std::endl;
   std::cout << std::endl;
-  std::cout << vector2pgstring(extractor.get_y_tagb_idx()) << ",";
-  std::cout << vector2pgstring(extractor.get_y_sigb_idx()) << ",";
+
+  std::cout << "b d idx, b lh idx: " << std::endl;
+  std::cout << vector2pgstring(extractor.get_b_d_idx()) << std::endl;
+  std::cout << vector2pgstring(extractor.get_b_lh_idx()) << std::endl;
+  std::cout << std::endl;
+
+  std::cout << "y tagb idx, y sigb idx: " << std::endl;
+  std::cout << vector2pgstring(extractor.get_y_tagb_idx()) << std::endl;
+  std::cout << vector2pgstring(extractor.get_y_sigb_idx()) << std::endl;
   std::cout << std::endl;
 
   std::ofstream fout("test.gv");

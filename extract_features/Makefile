@@ -1,4 +1,4 @@
-BINARIES = test2
+BINARIES = extract_reco_candidate_features
 OBJECTS = RecoFeatureExtractor.o RecoDmodeCatalogue.o
 
 BDTAUNU_INFO_EXTRACT_ROOT = /Users/dchao/workspace/bdtaunu_information_extraction
@@ -29,6 +29,9 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 
 all : $(BINARIES)
+
+extract_reco_candidate_features : $(addprefix $(BUILDDIR)/, extract_reco_candidate_features.o $(OBJECTS))
+	$(CXX) $(LDFLAGS) $^ -o $@
 
 test% : $(addprefix $(BUILDDIR)/, test%.o $(OBJECTS))
 	$(CXX) $(LDFLAGS) $^ -o $@
