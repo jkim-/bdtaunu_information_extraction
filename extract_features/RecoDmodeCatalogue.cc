@@ -3,6 +3,7 @@
 
 #include "RecoDmodeCatalogue.h"
 
+// you can add more or check these values against those defined in pdt.dat
 const int D0Lund = 421;        
 const int DcLund = 411;
 const int Dstar0Lund = 423;
@@ -13,29 +14,43 @@ const int KLund = 321;
 const int piLund = 211;
 const int gammaLund = 22;
 
+// initializes the D and D* trie's. 
 RecoDmodeCatalogue::RecoDmodeCatalogue() { RegisterDecays(); }
 
 RecoDmodeCatalogue::~RecoDmodeCatalogue() {};
 
-
 int RecoDmodeCatalogue::get_d_mode(const std::vector<int> &lund_list) const {
+
+  // preprocess the input lund list into the form understood by the trie
   std::vector<Alphabet> word;
   for (auto l : lund_list) word.push_back(LundToAlphabet(l));
   std::sort(word.begin(), word.end());
   word.push_back(Alphabet::null);
+
+  // return the search result. remember to cast it to an int. 
   return static_cast<int>(d_catalogue.find(word));
 }
 
 
 int RecoDmodeCatalogue::get_dstar_mode(const std::vector<int> &lund_list) const {
+
+  // preprocess the input lund list into the form understood by the trie
   std::vector<Alphabet> word;
   for (auto l : lund_list) word.push_back(LundToAlphabet(l));
   std::sort(word.begin(), word.end());
   word.push_back(Alphabet::null);
+
+  // return the search result. remember to cast it to an int. 
   return static_cast<int>(dstar_catalogue.find(word));
 }
 
 
+// D catalogue: one entry for every mode in the enum class Dmode.
+// D* catalogue: one entry for every mode in the enum class Dstarmode.
+//
+// notice that decays are inserted in ascending order of the 
+// enum class Alphabet. they are all terminated by the `null` element in 
+// the alphabet. 
 void RecoDmodeCatalogue::RegisterDecays() {
 
   // D catalogue
@@ -142,7 +157,9 @@ void RecoDmodeCatalogue::RegisterDecays() {
 
 }
 
-RecoDmodeCatalogue::Alphabet RecoDmodeCatalogue::LundToAlphabet(int lund) const {
+// function mapping a lund id to an element in `Alphabet`. 
+RecoDmodeCatalogue::Alphabet 
+RecoDmodeCatalogue::LundToAlphabet(int lund) const {
   switch (abs(lund)) {
     case DstarcLund:
       return Alphabet::Dstarc;
@@ -171,6 +188,10 @@ RecoDmodeCatalogue::Alphabet RecoDmodeCatalogue::LundToAlphabet(int lund) const 
     case gammaLund:
       return Alphabet::gamma;
       break;
+
+    // far from ideal: assert will cause anything 
+    // not in `Alphabet` to crash and burn; probably too harsh. 
+    // at least throw an exception? think about this problem later. 
     default:
       assert(false);
       return Alphabet::null;

@@ -5,35 +5,65 @@
 
 #include "RecoDmodeCatalogue.h"
 
+// RecoFeatureExtractor computes additional features 
+// to attach to reconstructed particles. 
+//
+// usage:
+//
+//     // create an extractor object. ready to accept data. 
+//     RecoFeatureExtractor extractor;
+//
+//     // apply inputs to the extractor.
+//     // automatically computes all the features of interest. 
+//     extractor.set_data(...);
+//
+//     // get the features of interest
+//     extractor.get_b_is_tagb(); 
+//     extractor.get_l_epid(); 
+//     ... 
+//
 class RecoFeatureExtractor {
 
   public:
+
+    // internal properties attached at each vertex
+    // idx_: global index in the reconstruction graph
+    // lund_id_: lund id of the particle
+    // local_idx_: local index in its candidate block (as in btatuplemaker). 
     struct VertexProperties {
-      int idx_;
-      int lund_id_;
+      int idx_;        
+      int lund_id_;   
       int local_idx_;
     };
 
+    // reconstruction graph typedefs
     using Graph = boost::adjacency_list<
       boost::vecS, boost::vecS,
       boost::bidirectionalS, VertexProperties>;
-
     using Vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
     using VertexIter = typename boost::graph_traits<Graph>::vertex_iterator;
     using OutEdgeIter = typename boost::graph_traits<Graph>::out_edge_iterator;
-
     using IntPropertyMap = boost::property_map<
       Graph, int VertexProperties::*>::type;
 
   public:
+
+    // constructs and initializes an object into a state ready to inputs
     RecoFeatureExtractor();
     ~RecoFeatureExtractor();
 
-    void set_data(int n_vertices, int n_edges, 
+    // main method that accepts inputs and computes the features. 
+    // calling this method also runs all feature computations. 
+    void set_data(
+
+                  // parameters required to build the reconstruction graph.
+                  int n_vertices, int n_edges, 
                   const std::vector<int> &from_vertices, 
                   const std::vector<int> &to_vertices, 
                   const std::vector<int> &lund_id, 
 
+                  // parameters required to assign specific reconstructed 
+                  // candidates to graph vertices. 
                   const std::vector<int> &y_reco_idx,
                   const std::vector<int> &b_reco_idx,
                   const std::vector<int> &d_reco_idx,
@@ -42,14 +72,19 @@ class RecoFeatureExtractor {
                   const std::vector<int> &l_reco_idx,
                   const std::vector<int> &gamma_reco_idx,
 
+                  // parameters required to extract features based on 
+                  // track properties. 
                   const std::vector<int> &ltrkidx, 
                   const std::vector<int> &htrkidx, 
                   const std::vector<int> &eselectorsmap, 
                   const std::vector<int> &muselectorsmap, 
 
+                  // parameters required to extract D candidate features
                   const std::vector<float> &dmass 
-                  );
+    );
 
+    // access extracted features based on the inputs 
+    // of the previous `set_data` call
     const std::vector<int>& get_l_epid() const { return l_epid_; }
     const std::vector<int>& get_l_mupid() const { return l_mupid_; }
     const std::vector<int>& get_h_epid() const { return h_epid_; }
@@ -63,6 +98,7 @@ class RecoFeatureExtractor {
     const std::vector<int>& get_y_tagb_idx() const { return y_tagb_idx_; }
     const std::vector<int>& get_y_sigb_idx() const { return y_sigb_idx_; }
 
+    // access reconstruction graph and its properties
     Graph get_graph() const;
     IntPropertyMap get_idx_pm();
     IntPropertyMap get_lund_id_pm();
