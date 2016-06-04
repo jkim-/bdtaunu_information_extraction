@@ -89,6 +89,7 @@ class RecoFeatureExtractor {
     const std::vector<int>& get_l_mupid() const { return l_mupid_; }
     const std::vector<int>& get_h_epid() const { return h_epid_; }
     const std::vector<int>& get_h_mupid() const { return h_mupid_; }
+    const std::vector<int>& get_d_is_dstar() const { return d_is_dstar_; }
     const std::vector<float>& get_d_dmass() const { return d_dmass_; }
     const std::vector<int>& get_d_dmode() const { return d_dmode_; }
     const std::vector<int>& get_d_dstarmode() const { return d_dstarmode_; }
@@ -112,39 +113,36 @@ class RecoFeatureExtractor {
     void build_reconstruction_graph(int, int, 
         const std::vector<int>&, const std::vector<int>&, 
         const std::vector<int>&, const std::vector<std::vector<int>>&);
-    void construct_graph(Graph &g, std::vector<Vertex> &idx2vtx,
-        int n_vertices, int n_edges,
-        const std::vector<int> &from_vertices, 
-        const std::vector<int> &to_vertices);
-    void populate_lund_id(Graph &g,
-        const std::vector<int> &lund_id);
-    void populate_local_idx(Graph &g,
-        const std::vector<std::vector<int>> &global_indices);
+    void construct_graph(Graph&, std::vector<Vertex>&, int, int,
+        const std::vector<int>&, const std::vector<int>&); 
+    void populate_lund_id(Graph&g,const std::vector<int>&);
+    void populate_local_idx(Graph&, const std::vector<std::vector<int>>&);
 
-    void cache_is_dstar(
-        const std::vector<int> &d_reco_idx, 
-        std::vector<int> &is_dstar);
-
-    void assemble_decay_string(int reco_idx, 
-        std::vector<int> &lund_list);
-
+    // helper functions for l, h, gamma block feature extraction
+    void extract_lhg_features(
+        const std::vector<int>&, const std::vector<int>&,
+        const std::vector<int>&, const std::vector<int>&);
     void extract_pid(
-        const std::vector<int> &ltrkidx, const std::vector<int> &htrkidx, 
-        const std::vector<int> &eselectorsmap, 
-        const std::vector<int> &muselectorsmap);
-
+        const std::vector<int>&, const std::vector<int>&, 
+        const std::vector<int>&, const std::vector<int>&);
+    
+    // helper functions for d block feature extraction
+    void extract_d_features(
+        const std::vector<int>&, const std::vector<float>&);
     void extract_d_dmass(
-        const std::vector<int> &d_reco_idx,
-        const std::vector<float> &dmass);
+        const std::vector<int>&, const std::vector<float>&);
+    void extract_d_is_dstar(const std::vector<int>&);
+    void extract_d_modes(const std::vector<int>&);
+    void assemble_d_decay_string(int, std::vector<int>&);
 
-    void extract_d_modes(const std::vector<int> &d_reco_idx);
+    // helper functions for b block feature extraction
+    void extract_b_features(const std::vector<int>&);
+    void extract_b_is_tag(const std::vector<int>&);
+    void extract_b_daughter_local_indices(const std::vector<int>&);
 
-    void extract_b_is_tag(const std::vector<int> &b_reco_idx);
-
-    void extract_b_daughter_local_indices(
-        const std::vector<int> &b_reco_idx);
-
-    void extract_y_b_idx(const std::vector<int> &y_reco_idx);
+    // helper functions for y block feature extraction
+    void extract_y_features(const std::vector<int>&);
+    void extract_y_b_idx(const std::vector<int>&);
 
   private:
 
@@ -159,6 +157,7 @@ class RecoFeatureExtractor {
     // cache to store computed features
     std::vector<int> l_epid_, l_mupid_;
     std::vector<int> h_epid_, h_mupid_;
+    std::vector<int> d_is_dstar_;
     std::vector<float> d_dmass_;
     std::vector<int> d_dmode_;
     std::vector<int> d_dstarmode_;
