@@ -14,13 +14,12 @@ RecoFeatureExtractor::RecoFeatureExtractor()
 
 RecoFeatureExtractor::~RecoFeatureExtractor() {}
 
+// clear data caches
 void RecoFeatureExtractor::clear_cache() {
   g_.clear();
   idx2vtx_.clear();
-  l_epid_.clear();
-  l_mupid_.clear();
-  h_epid_.clear();
-  l_mupid_.clear();
+  l_epid_.clear(); l_mupid_.clear();
+  h_epid_.clear(); h_mupid_.clear();
   d_dmass_.clear();
   d_dmode_.clear();
   d_dstarmode_.clear();
@@ -31,7 +30,9 @@ void RecoFeatureExtractor::clear_cache() {
   y_sigb_idx_.clear();
 }
 
+
 void RecoFeatureExtractor::set_data(
+
     int n_vertices, int n_edges, 
     const std::vector<int> &from_vertices, 
     const std::vector<int> &to_vertices, 
@@ -50,18 +51,20 @@ void RecoFeatureExtractor::set_data(
     const std::vector<int> &eselectorsmap, 
     const std::vector<int> &muselectorsmap, 
     
-    const std::vector<float> &dmass 
-    ) {
+    const std::vector<float> &dmass
+
+) {
   
 
+  // clear out data caches before populating them with new results
   clear_cache();
 
-  construct_graph(g_, idx2vtx_, n_vertices, n_edges, 
-                  from_vertices, to_vertices);
-  populate_lund_id(g_, lund_id);
-  populate_local_idx(g_, 
+  // build the reconstruction graph. required to compute certain features
+  build_reconstruction_graph(n_vertices, n_edges, 
+      from_vertices, to_vertices, lund_id, 
       { y_reco_idx, b_reco_idx, d_reco_idx, c_reco_idx, 
-        h_reco_idx, l_reco_idx, gamma_reco_idx });
+        h_reco_idx, l_reco_idx, gamma_reco_idx } );
+  
 
   extract_pid(ltrkidx, htrkidx, eselectorsmap, muselectorsmap);
 
@@ -73,6 +76,96 @@ void RecoFeatureExtractor::set_data(
 
   extract_y_b_idx(y_reco_idx);
 
+}
+
+// build the reconstruction graph and attach all internal attributes
+void RecoFeatureExtractor::build_reconstruction_graph(
+    int n_vertices, int n_edges, 
+    const std::vector<int> &from_vertices, 
+    const std::vector<int> &to_vertices, 
+    const std::vector<int> &lund_id, 
+    const std::vector<std::vector<int>> &recoblock_global_indices) {
+
+  // construct the graph itself
+  construct_graph(g_, idx2vtx_, n_vertices, n_edges, 
+                  from_vertices, to_vertices);
+
+  // attach internal properties 
+  populate_lund_id(g_, lund_id);
+  populate_local_idx(g_, recoblock_global_indices);
+}
+
+
+void RecoFeatureExtractor::construct_graph(
+    Graph &g, std::vector<Vertex> &idx2vtx,
+    int n_vertices, int n_edges,
+    const std::vector<int> &from_vertices, 
+    const std::vector<int> &to_vertices) {
+
+  // check for argument consistency
+  if (from_vertices.size() != static_cast<unsigned>(n_edges)) {
+    throw std::invalid_argument(
+        "RecoFeatureExtractor::construct_graph(): n_vertices and " 
+        "from_vertices.size() must agree. "
+    );
+  }
+
+  if (to_vertices.size() != from_vertices.size()) {
+    throw std::invalid_argument(
+        "RecoFeatureExtractor::construct_graph(): from_vertices.size() "
+        "must agree with to_vertices.size(). "
+    );
+  }
+
+  // clear the graph 
+  g.clear();
+  idx2vtx.clear();
+
+  // establish a mapping between vertex index and vertex descriptors
+  std::vector<Vertex> vertex_map(n_vertices);
+
+  // insert vertices and bind internal properties
+  for (int i = 0; i < n_vertices; ++i) {
+    Vertex u = boost::add_vertex(g);
+    vertex_map[i] = u;
+    g[u].idx_ = i;
+  }
+  idx2vtx = vertex_map;
+
+  // insert edges
+  for (int i = 0; i < n_edges; ++i) {
+    boost::add_edge(vertex_map[from_vertices[i]], 
+                    vertex_map[to_vertices[i]], g);
+  }
+}
+
+
+void RecoFeatureExtractor::populate_lund_id(Graph &g,
+    const std::vector<int> &lund_id) {
+
+  // check for argument consistency
+  if (lund_id.size() != num_vertices(g)) {
+    throw std::invalid_argument(
+        "RecoFeatureExtractor::populate_lund_id(): "
+        "lund_id.size() must agree with num_vertices(g). "
+    );
+  }
+
+  // populate attributes
+  VertexIter vi, vi_end;
+  for (std::tie(vi, vi_end) = vertices(g); vi != vi_end; ++vi) {
+    g[*vi].lund_id_ = lund_id[g[*vi].idx_];
+  }
+}
+
+
+void RecoFeatureExtractor::populate_local_idx(Graph &g,
+    const std::vector<std::vector<int>> &recoblock_global_indices) {
+  for (const auto &index_v : recoblock_global_indices) {
+    for (int i = 0; i < index_v.size(); ++i) {
+      g[idx2vtx_[index_v[i]]].local_idx_ = i;
+    }
+  }
 }
 
 void RecoFeatureExtractor::extract_y_b_idx(
@@ -326,83 +419,3 @@ void RecoFeatureExtractor::extract_pid(
 }
 
 
-void RecoFeatureExtractor::construct_graph(
-    Graph &g, std::vector<Vertex> &idx2vtx,
-    int n_vertices, int n_edges,
-    const std::vector<int> &from_vertices, 
-    const std::vector<int> &to_vertices) {
-
-  // check for argument consistency
-  if (from_vertices.size() != static_cast<unsigned>(n_edges)) {
-    throw std::invalid_argument(
-        "RecoFeatureExtractor::construct_graph(): n_vertices and " 
-        "from_vertices.size() must agree. "
-    );
-  }
-
-  if (to_vertices.size() != from_vertices.size()) {
-    throw std::invalid_argument(
-        "RecoFeatureExtractor::construct_graph(): from_vertices.size() "
-        "must agree with to_vertices.size(). "
-    );
-  }
-
-  // clear the graph 
-  g.clear();
-  idx2vtx.clear();
-
-  // establish a mapping between vertex index and vertex descriptors
-  std::vector<Vertex> vertex_map(n_vertices);
-
-  // insert vertices and bind internal properties
-  for (int i = 0; i < n_vertices; ++i) {
-    Vertex u = boost::add_vertex(g);
-    vertex_map[i] = u;
-    g[u].idx_ = i;
-  }
-  idx2vtx = vertex_map;
-
-  // insert edges
-  for (int i = 0; i < n_edges; ++i) {
-    boost::add_edge(vertex_map[from_vertices[i]], 
-                    vertex_map[to_vertices[i]], g);
-  }
-
-
-}
-
-void RecoFeatureExtractor::populate_lund_id(Graph &g,
-    const std::vector<int> &lund_id) {
-
-  // check for argument consistency
-  if (lund_id.size() != num_vertices(g)) {
-    throw std::invalid_argument(
-        "RecoFeatureExtractor::populate_lund_id(): "
-        "lund_id.size() must agree with num_vertices(g). "
-    );
-  }
-
-  // populate attributes
-  VertexIter vi, vi_end;
-  for (std::tie(vi, vi_end) = vertices(g); vi != vi_end; ++vi) {
-    g[*vi].lund_id_ = lund_id[g[*vi].idx_];
-  }
-
-}
-
-void RecoFeatureExtractor::populate_local_idx(Graph &g,
-    const std::vector<std::vector<int>> &global_indices) {
-
-  std::vector<Vertex> vertex_map(num_vertices(g));
-  VertexIter vi, vi_end;
-  for (std::tie(vi, vi_end) = vertices(g); vi != vi_end; ++vi) {
-    vertex_map[g[*vi].idx_] = *vi;
-  }
-
-  for (const auto &index_v : global_indices) {
-    for (int i = 0; i < index_v.size(); ++i) {
-      g[vertex_map[index_v[i]]].local_idx_ = i;
-    }
-  }
-
-}

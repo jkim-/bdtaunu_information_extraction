@@ -99,22 +99,25 @@ class RecoFeatureExtractor {
     const std::vector<int>& get_y_sigb_idx() const { return y_sigb_idx_; }
 
     // access reconstruction graph and its properties
-    Graph get_graph() const;
-    IntPropertyMap get_idx_pm();
-    IntPropertyMap get_lund_id_pm();
-    IntPropertyMap get_local_idx_pm();
+    Graph get_graph() const { return g_; }
+    IntPropertyMap get_idx_pm() { return get(&VertexProperties::idx_, g_); }
+    IntPropertyMap get_lund_id_pm() { return get(&VertexProperties::lund_id_, g_); }
+    IntPropertyMap get_local_idx_pm() { return get(&VertexProperties::local_idx_, g_); }
 
   private:
+
     void clear_cache();
 
+    // helper functions for graph construction
+    void build_reconstruction_graph(int, int, 
+        const std::vector<int>&, const std::vector<int>&, 
+        const std::vector<int>&, const std::vector<std::vector<int>>&);
     void construct_graph(Graph &g, std::vector<Vertex> &idx2vtx,
         int n_vertices, int n_edges,
         const std::vector<int> &from_vertices, 
         const std::vector<int> &to_vertices);
-
     void populate_lund_id(Graph &g,
         const std::vector<int> &lund_id);
-
     void populate_local_idx(Graph &g,
         const std::vector<std::vector<int>> &global_indices);
 
@@ -145,11 +148,15 @@ class RecoFeatureExtractor {
 
   private:
 
+    // d mode catalogue
     RecoDmodeCatalogue d_catalogue_;
 
+    // reconstruction graph and a map between 
+    // a reco index and the Vertex object
     Graph g_;
     std::vector<Vertex> idx2vtx_;
 
+    // cache to store computed features
     std::vector<int> l_epid_, l_mupid_;
     std::vector<int> h_epid_, h_mupid_;
     std::vector<float> d_dmass_;
@@ -162,23 +169,5 @@ class RecoFeatureExtractor {
     std::vector<int> y_sigb_idx_;
 
 };
-
-inline RecoFeatureExtractor::Graph 
-RecoFeatureExtractor::get_graph() const { return g_; }
-
-inline RecoFeatureExtractor::IntPropertyMap 
-RecoFeatureExtractor::get_idx_pm() {
-  return get(&VertexProperties::idx_, g_);
-}
-
-inline RecoFeatureExtractor::IntPropertyMap 
-RecoFeatureExtractor::get_lund_id_pm() {
-  return get(&VertexProperties::lund_id_, g_);
-}
-
-inline RecoFeatureExtractor::IntPropertyMap 
-RecoFeatureExtractor::get_local_idx_pm() {
-  return get(&VertexProperties::local_idx_, g_);
-}
 
 #endif
