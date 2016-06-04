@@ -74,10 +74,18 @@ int main() {
   std::cout << vector2pgstring(extractor.get_h_mupid()) << ",";
   std::cout << std::endl;
   std::cout << vector2pgstring(dmass) << ",";
-  std::cout << vector2pgstring(extractor.get_dmeson_mass()) << ",";
+  std::cout << vector2pgstring(extractor.get_d_dmass()) << ",";
   std::cout << std::endl;
-  std::cout << vector2pgstring(extractor.get_dmeson_mode()) << ",";
-  std::cout << vector2pgstring(extractor.get_dstar_mode()) << ",";
+  std::cout << vector2pgstring(extractor.get_d_dmode()) << ",";
+  std::cout << vector2pgstring(extractor.get_d_dstarmode()) << ",";
+  std::cout << std::endl;
+  std::cout << vector2pgstring(extractor.get_b_is_tag()) << ",";
+  std::cout << std::endl;
+  std::cout << vector2pgstring(extractor.get_b_d_idx()) << ",";
+  std::cout << vector2pgstring(extractor.get_b_lh_idx()) << ",";
+  std::cout << std::endl;
+  std::cout << vector2pgstring(extractor.get_y_tagb_idx()) << ",";
+  std::cout << vector2pgstring(extractor.get_y_sigb_idx()) << ",";
   std::cout << std::endl;
 
   std::ofstream fout("test.gv");

@@ -54,9 +54,14 @@ class RecoFeatureExtractor {
     const std::vector<int>& get_l_mupid() const { return l_mupid_; }
     const std::vector<int>& get_h_epid() const { return h_epid_; }
     const std::vector<int>& get_h_mupid() const { return h_mupid_; }
-    const std::vector<float>& get_dmeson_mass() const { return dmeson_mass_; }
-    const std::vector<int>& get_dmeson_mode() const { return dmeson_mode_; }
-    const std::vector<int>& get_dstar_mode() const { return dstar_mode_; }
+    const std::vector<float>& get_d_dmass() const { return d_dmass_; }
+    const std::vector<int>& get_d_dmode() const { return d_dmode_; }
+    const std::vector<int>& get_d_dstarmode() const { return d_dstarmode_; }
+    const std::vector<int>& get_b_is_tag() const { return b_is_tag_; }
+    const std::vector<int>& get_b_d_idx() const { return b_d_idx_; }
+    const std::vector<int>& get_b_lh_idx() const { return b_lh_idx_; }
+    const std::vector<int>& get_y_tagb_idx() const { return y_tagb_idx_; }
+    const std::vector<int>& get_y_sigb_idx() const { return y_sigb_idx_; }
 
     Graph get_graph() const;
     IntPropertyMap get_idx_pm();
@@ -89,11 +94,18 @@ class RecoFeatureExtractor {
         const std::vector<int> &eselectorsmap, 
         const std::vector<int> &muselectorsmap);
 
-    void extract_dmeson_mass(
+    void extract_d_dmass(
         const std::vector<int> &d_reco_idx,
         const std::vector<float> &dmass);
 
     void extract_d_modes(const std::vector<int> &d_reco_idx);
+
+    void extract_b_is_tag(const std::vector<int> &b_reco_idx);
+
+    void extract_b_daughter_local_indices(
+        const std::vector<int> &b_reco_idx);
+
+    void extract_y_b_idx(const std::vector<int> &y_reco_idx);
 
   private:
 
@@ -104,9 +116,14 @@ class RecoFeatureExtractor {
 
     std::vector<int> l_epid_, l_mupid_;
     std::vector<int> h_epid_, h_mupid_;
-    std::vector<float> dmeson_mass_;
-    std::vector<int> dmeson_mode_;
-    std::vector<int> dstar_mode_;
+    std::vector<float> d_dmass_;
+    std::vector<int> d_dmode_;
+    std::vector<int> d_dstarmode_;
+    std::vector<int> b_is_tag_;
+    std::vector<int> b_d_idx_;
+    std::vector<int> b_lh_idx_;
+    std::vector<int> y_tagb_idx_;
+    std::vector<int> y_sigb_idx_;
 
 };
 
