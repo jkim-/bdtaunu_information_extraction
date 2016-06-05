@@ -11,7 +11,7 @@
 
 namespace po = boost::program_options;
 
-void extract_reco_candidate_features(const po::variables_map &vm);
+void extract_candidate_features(const po::variables_map &vm);
 
 int main(int argc, char **argv) {
 
@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
 
     if (vm.count("help") || !vm.count("config_file")) {
       std::cout << std::endl;
-      std::cout << "Usage: ./extract_reco_candidate_features ";
+      std::cout << "Usage: ./extract_candidate_features ";
       std::cout << "[options] config_fname" << std::endl;
       std::cout << visible << "\n";
       return 0;
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
     notify(vm);
 
     // main routine
-    extract_reco_candidate_features(vm);
+    extract_candidate_features(vm);
 
   } catch(std::exception& e) {
 
@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-void extract_reco_candidate_features(const po::variables_map &vm) {
+void extract_candidate_features(const po::variables_map &vm) {
 
   // open database connection and populate fields
   std::string dbname = vm["dbname"].as<std::string>();
