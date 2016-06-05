@@ -1,4 +1,4 @@
-CREATE TABLE feature_extraction_input_sigmc AS 
+CREATE MATERIALIZED VIEW feature_extraction_input_sp1235 AS 
 SELECT
   eid, 
   reco_n_vertices,
@@ -19,6 +19,4 @@ SELECT
   muselectorsmap, 
   dmass
 FROM 
-  framework_ntuples INNER JOIN graph_sigmc using (eid);
-
-CREATE INDEX ON feature_extraction_input_sigmc (eid);
+  framework_ntuples_sp1235 INNER JOIN graph_sp1235 using (eid);
