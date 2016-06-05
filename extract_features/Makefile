@@ -1,13 +1,13 @@
 BINARIES = extract_candidate_features
 OBJECTS = RecoFeatureExtractor.o RecoDmodeCatalogue.o
 
-BDTAUNU_INFO_EXTRACT_ROOT = /Users/dchao/workspace/bdtaunu_information_extraction
+BDTAUNU_INFO_EXTRACT_ROOT = /home/dchao/workspace/bdtaunu_information_extraction
 UTILS_ROOT = $(BDTAUNU_INFO_EXTRACT_ROOT)/utils
 
-BOOST_ROOT = /usr/local/boost_1_56_0
+BOOST_ROOT = /usr/local/boost_1_59_0
 BOOST_LIBS = $(BOOST_ROOT)/stage/lib
 
-LIBPQ_ROOT = /usr/local/pgsql
+LIBPQ_ROOT = /usr/pgsql-9.4
 LIBPQ_INCS = $(LIBPQ_ROOT)/include
 LIBPQ_LIBS = $(LIBPQ_ROOT)/lib
 
@@ -18,7 +18,7 @@ LDFLAGS = -L $(UTILS_ROOT) -L$(BOOST_LIBS) -L$(LIBPQ_LIBS) \
 					-Wl,-rpath,$(LIBPQ_LIBS) -lpq
 
 CXX := g++
-CXXFLAGS = -Wall -fPIC -pthread -std=c++11 -O2 -Wno-unused-local-typedef -Wno-redeclared-class-member
+CXXFLAGS = -Wall -fPIC -pthread -std=c++11 -O2 #-Wno-unused-local-typedef -Wno-redeclared-class-member
 
 SRCS = $(wildcard *.cc)
 BUILDDIR = build

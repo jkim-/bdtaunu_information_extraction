@@ -162,7 +162,7 @@ void RecoFeatureExtractor::extract_y_b_idx(
 
   // for each y candidate, loop through its daughters and save 
   // the relevante informatiion accordingly
-  for (int i = 0; i < y_reco_idx.size(); ++i) {
+  for (size_t i = 0; i < y_reco_idx.size(); ++i) {
 
     Vertex u = idx2vtx_[y_reco_idx[i]];
 
@@ -205,7 +205,7 @@ void RecoFeatureExtractor::extract_b_is_tag(
 
   // loop over daughters and check for the presence of a lepton. 
   Vertex u; OutEdgeIter oe, oe_end; 
-  for (int i = 0; i < b_reco_idx.size(); ++i) {
+  for (size_t i = 0; i < b_reco_idx.size(); ++i) {
 
     bool found_lepton = false;
 
@@ -227,7 +227,7 @@ void RecoFeatureExtractor::extract_b_daughter_local_indices(
   b_lh_idx_ = std::vector<int>(b_reco_idx.size(), -1);
 
   // loop over each b candidate 
-  for (int i = 0; i < b_reco_idx.size(); ++i) {
+  for (size_t i = 0; i < b_reco_idx.size(); ++i) {
 
     // u: vertex for the b candidate
     Vertex u = idx2vtx_[b_reco_idx[i]];
@@ -291,7 +291,7 @@ void RecoFeatureExtractor::extract_d_is_dstar(
   d_is_dstar_ = std::vector<int>(d_reco_idx.size(), 0);
 
   // decide based on the absolute lund id 
-  for (int i = 0; i < d_reco_idx.size(); ++i) {
+  for (size_t i = 0; i < d_reco_idx.size(); ++i) {
     if (is_dstar(g_[idx2vtx_[d_reco_idx[i]]].lund_id_)) {
       d_is_dstar_[i] = 1;
     }
@@ -312,12 +312,12 @@ void RecoFeatureExtractor::extract_d_dmass(
 
   // first pass: fill D meson masses. 
   d_dmass_ = std::vector<float>(d_reco_idx.size(), -1);
-  for (int i = 0; i < dmass.size(); ++i) {
+  for (size_t i = 0; i < dmass.size(); ++i) {
     if (!d_is_dstar_[i]) { d_dmass_[i] = dmass[i]; }
   }
 
   // second pass: for each D* meson, fill its D daughter's  mass. 
-  for (int i = 0; i < dmass.size(); ++i) {
+  for (size_t i = 0; i < dmass.size(); ++i) {
 
     if (d_is_dstar_[i]) { 
 
@@ -365,7 +365,7 @@ void RecoFeatureExtractor::extract_d_modes(
 
   // first pass: deduce the decay mode for the D candidate. 
   std::vector<int> lund_list;
-  for (int i = 0; i < d_reco_idx.size(); ++i) {
+  for (size_t i = 0; i < d_reco_idx.size(); ++i) {
 
     // get the d decay lund id vector
     assemble_d_decay_string(d_reco_idx[i], lund_list);
@@ -381,7 +381,7 @@ void RecoFeatureExtractor::extract_d_modes(
 
   // second pass: for D* candidates, its D meson mode will be the mode
   // of its D daughter. (the mode of the D* itself computed in first pass)
-  for (int i = 0; i < d_reco_idx.size(); ++i) {
+  for (size_t i = 0; i < d_reco_idx.size(); ++i) {
 
     if (d_is_dstar_[i]) {
 
@@ -577,7 +577,7 @@ void RecoFeatureExtractor::populate_lund_id(Graph &g,
 void RecoFeatureExtractor::populate_local_idx(Graph &g,
     const std::vector<std::vector<int>> &recoblock_global_indices) {
   for (const auto &index_v : recoblock_global_indices) {
-    for (int i = 0; i < index_v.size(); ++i) {
+    for (size_t i = 0; i < index_v.size(); ++i) {
       g[idx2vtx_[index_v[i]]].local_idx_ = i;
     }
   }
