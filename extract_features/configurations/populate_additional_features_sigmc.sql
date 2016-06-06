@@ -21,4 +21,6 @@ CREATE TABLE additional_features_sigmc (
 
 DROP MATERIALIZED VIEW feature_extraction_input_sigmc;
 
+CREATE INDEX ON additional_features_sigmc (eid);
+
 COMMIT;

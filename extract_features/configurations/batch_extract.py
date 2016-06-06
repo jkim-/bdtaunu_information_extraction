@@ -10,7 +10,8 @@ job_suffixes = [
     'sp1005',
     'sp998',
     'sigmc',
-    'data' ]
+    'data', 
+    ]
 
 executable_path = '../extract_candidate_features'
 executable_cfg_template = 'extract_candidate_features_{0}.cfg'

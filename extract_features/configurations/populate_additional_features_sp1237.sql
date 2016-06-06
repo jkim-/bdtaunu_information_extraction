@@ -21,4 +21,6 @@ CREATE TABLE additional_features_sp1237 (
 
 DROP MATERIALIZED VIEW feature_extraction_input_sp1237;
 
+CREATE INDEX ON additional_features_sp1237 (eid);
+
 COMMIT;
