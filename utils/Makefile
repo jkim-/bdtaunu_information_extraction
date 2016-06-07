@@ -1,5 +1,5 @@
 BINARIES = test1
-OBJECTS = PsqlReader.o
+OBJECTS = PsqlReader.o CsvWriter.o
 
 LIBNAME = libbdtaunu_info_extract_utils.so
 

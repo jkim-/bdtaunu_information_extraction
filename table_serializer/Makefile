@@ -1,4 +1,4 @@
-BINARIES = test1
+BINARIES = test1 test2
 OBJECTS = 
 
 BDTAUNU_INFO_EXTRACT_ROOT = /Users/dchao/workspace/bdtaunu_information_extraction
