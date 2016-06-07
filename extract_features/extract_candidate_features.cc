@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
         ("dbname", po::value<std::string>(), 
              "database name. ")
         ("table_name", po::value<std::string>(), 
-             "name of the table containing the truth match inputs. ")
+             "name of the table containing the feature extraction inputs. ")
         ("output_fname", po::value<std::string>(), 
              "output csv file name to store extracted result. ")
         ("cursor_fetch_size", po::value<int>()->default_value(5000), 

@@ -2,7 +2,9 @@ CREATE MATERIALIZED VIEW serializer_inputs_sigmc AS
 SELECT 
   eid, 
   ny, 
-
+  ntracks,
+  r2, 
+  r2all, 
   ybpairmmiss2,
   ybpairmmissprime2, 
   ybpaireextra50, 
@@ -10,7 +12,6 @@ SELECT
   ytagblp3magcm,
   ytagbcosby,
   ytagbcosthetadlcm,
-
   ytagbdstardeltam,
   ytagbcosthetadsoftcm,
   ytagbsoftp3magcm,
@@ -23,7 +24,6 @@ SELECT
   ysigbsoftp3magcm,
   ysigbhmass,
   ysigbvtxprobh,
-
   y_tagb_idx,
   y_sigb_idx,
   b_istag,

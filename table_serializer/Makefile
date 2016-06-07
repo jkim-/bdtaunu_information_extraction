@@ -1,4 +1,4 @@
-BINARIES = test1 test2
+BINARIES = serialize_features
 OBJECTS = 
 
 BDTAUNU_INFO_EXTRACT_ROOT = /Users/dchao/workspace/bdtaunu_information_extraction
@@ -18,7 +18,7 @@ LDFLAGS = -L $(UTILS_ROOT) -L$(BOOST_LIBS) -L$(LIBPQ_LIBS) \
 					-Wl,-rpath,$(LIBPQ_LIBS) -lpq
 
 CXX := g++
-CXXFLAGS = -Wall -fPIC -pthread -std=c++11 -O2 #-Wno-unused-local-typedef -Wno-redeclared-class-member
+CXXFLAGS = -Wall -fPIC -pthread -std=c++11 -O2 -Wno-unused-local-typedef -Wno-redeclared-class-member
 
 SRCS = $(wildcard *.cc)
 BUILDDIR = build
@@ -29,6 +29,9 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 
 all : $(BINARIES)
+
+serialize_features : $(addprefix $(BUILDDIR)/, serialize_features.o $(OBJECTS))
+	$(CXX) $(LDFLAGS) $^ -o $@
 
 test% : $(addprefix $(BUILDDIR)/, test%.o $(OBJECTS))
 	$(CXX) $(LDFLAGS) $^ -o $@

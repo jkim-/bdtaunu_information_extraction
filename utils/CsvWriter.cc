@@ -39,6 +39,7 @@ void CsvWriter::commit() {
     line += cache_[i] + ",";
     cache_[i] = "";
   }
+  line.pop_back();
   fout_ << line << std::endl;
 }
 
