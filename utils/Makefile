@@ -1,11 +1,12 @@
+BINARIES = test1
 OBJECTS = PsqlReader.o
 
 LIBNAME = libbdtaunu_info_extract_utils.so
 
-BOOST_ROOT = /usr/local/boost_1_59_0
+BOOST_ROOT = /usr/local/boost_1_56_0
 BOOST_LIBS = $(BOOST_ROOT)/stage/lib
 
-LIBPQ_ROOT = /usr/pgsql-9.4
+LIBPQ_ROOT = /usr/local/pgsql
 LIBPQ_INCS = $(LIBPQ_ROOT)/include
 LIBPQ_LIBS = $(LIBPQ_ROOT)/lib
 
@@ -25,7 +26,12 @@ $(shell mkdir -p $(DEPDIR) > /dev/null)
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 
+all : lib $(BINARIES)
+
 lib : $(LIBNAME)
+
+test% : $(addprefix $(BUILDDIR)/, test%.o $(OBJECTS))
+	  $(CXX) $(LDFLAGS) $^ -o $@
 
 $(LIBNAME) : $(addprefix $(BUILDDIR)/, $(OBJECTS))
 	if [ "$(shell uname)" = "Darwin" ]; then \
@@ -48,7 +54,7 @@ $(DEPDIR)/%.d: ;
 -include $(patsubst %,$(DEPDIR)/%.d,$(basename $(SRCS)))
 
 clean : 
-	@rm -f *~ $(BUILDDIR)/* $(LIBNAME)
+	@rm -f *~ $(BUILDDIR)/* $(LIBNAME) $(BINARIES)
 
 cleanall : clean
 	@rm -f $(DEPDIR)/*

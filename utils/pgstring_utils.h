@@ -1,5 +1,5 @@
-#ifndef _PGSTRING_CONVERT_H_
-#define _PGSTRING_CONVERT_H_
+#ifndef _PGSTRING_UTILS_H_
+#define _PGSTRING_UTILS_H_
 
 #include <string>
 #include <vector>
@@ -7,106 +7,100 @@
 #include <sstream>
 #include <boost/tokenizer.hpp>
 
+namespace pgstring_utils {
+
 // helper classes and objects
 // --------------------------
 
 // trait classes and specializations
 template <typename T>
-class pgstring_conversion_traits;
+class conversion_traits;
 
 template <>
-class pgstring_conversion_traits<int> {
+class conversion_traits<int> {
   public:
 
-    static int convert_string2type(const std::string &s) { 
+    static int string2type(const std::string &s) { 
       return std::stoi(s); 
     }
 
-    static std::string convert_type2string(const int &v) { 
+    static std::string type2string(const int &v) { 
       return std::to_string(v); 
     }
 };
 
 template <>
-class pgstring_conversion_traits<float> {
+class conversion_traits<float> {
   public:
 
-    static float convert_string2type(const std::string &s) { 
+    static float string2type(const std::string &s) { 
       return std::stof(s); 
     }
 
-    static std::string convert_type2string(const float &v) { 
-      pgstring_convert_float_ss_.str("");
-      pgstring_convert_float_ss_.clear();
-      pgstring_convert_float_ss_ << v;
-      return pgstring_convert_float_ss_.str();
+    static std::string type2string(const float &v) { 
+      ss_.str(""); ss_.clear(); ss_ << v;
+      return ss_.str();
     }
 
   private:
-    static std::stringstream pgstring_convert_float_ss_;
-    static std::stringstream initialize_sstream();
+    static std::stringstream ss_;
+    static std::stringstream init_ss();
 };
 
-std::stringstream 
-pgstring_conversion_traits<float>::initialize_sstream() {
+std::stringstream conversion_traits<float>::init_ss() {
   std::stringstream ss; ss.precision(10);
   return ss;
 }
 
 std::stringstream 
-pgstring_conversion_traits<float>::pgstring_convert_float_ss_ 
-  = pgstring_conversion_traits<float>::initialize_sstream();
-
+conversion_traits<float>::ss_ = conversion_traits<float>::init_ss();
 
 template <>
-class pgstring_conversion_traits<double> {
+class conversion_traits<double> {
   public:
-    static double convert_string2type(const std::string &s) { 
+    static double string2type(const std::string &s) { 
       return std::stod(s); 
     }
 
-    static std::string convert_type2string(const double &v) { 
-      pgstring_convert_double_ss_.str("");
-      pgstring_convert_double_ss_.clear();
-      pgstring_convert_double_ss_ << v;
-      return pgstring_convert_double_ss_.str();
+    static std::string type2string(const double &v) { 
+      ss_.str(""); ss_.clear(); ss_ << v;
+      return ss_.str();
     }
 
   private:
-    static std::stringstream pgstring_convert_double_ss_;
-    static std::stringstream initialize_sstream();
+    static std::stringstream ss_;
+    static std::stringstream init_ss();
 };
 
 std::stringstream 
-pgstring_conversion_traits<double>::initialize_sstream() {
+conversion_traits<double>::init_ss() {
   std::stringstream ss; ss.precision(19);
   return ss;
 }
 
 std::stringstream 
-pgstring_conversion_traits<double>::pgstring_convert_double_ss_ 
-  = pgstring_conversion_traits<double>::initialize_sstream();
+conversion_traits<double>::ss_ = conversion_traits<double>::init_ss();
 
 
 // fuctions converting text => binary type
 // ---------------------------------------
 
 // functions that convert postgres text data to fundamental types 
-inline void pgstring_convert(const std::string &s, int &v) { 
-  v = pgstring_conversion_traits<int>::convert_string2type(s); 
+inline void string2type(const std::string &s, int &v) { 
+  v = conversion_traits<int>::string2type(s); 
 }
 
-inline void pgstring_convert(const std::string &s, float &v) { 
-  v = pgstring_conversion_traits<float>::convert_string2type(s); 
+inline void string2type(const std::string &s, float &v) { 
+  v = conversion_traits<float>::string2type(s); 
 }
 
-inline void pgstring_convert(const std::string &s, double &v) { 
-  v = pgstring_conversion_traits<double>::convert_string2type(s); 
+inline void string2type(const std::string &s, double &v) { 
+  v = conversion_traits<double>::string2type(s); 
 }
 
 // function that convert postgres text data to std::vector
 template <typename T> 
-void pgstring_convert(const std::string &s, std::vector<T> &v, 
+void string2type(const std::string &s, std::vector<T> &v, 
     const std::string &enclosure_chars="{}",
     const boost::char_separator<char> &sep = 
     boost::char_separator<char>(",", "", boost::keep_empty_tokens)) {
@@ -122,31 +116,33 @@ void pgstring_convert(const std::string &s, std::vector<T> &v,
 
   transform(tok.begin(), tok.end(), 
             std::back_inserter(v), 
-            pgstring_conversion_traits<T>::convert_string2type);
+            conversion_traits<T>::string2type);
 }
 
-// fuctions converting binary type => text (with controlled precision)
-// -------------------------------------------------------------------
+// fuctions converting binary type => string (with controlled precision)
+// ---------------------------------------------------------------------
 
 template <typename T> 
-inline std::string pgstring_convert_to_string(const T &v) {
-  return pgstring_conversion_traits<T>::convert_type2string(v);
+inline std::string type2string(const T &v) {
+  return conversion_traits<T>::type2string(v);
 }
 
 // function that converts std::vector to postgres text data. 
 template <typename T> 
-std::string vector2pgstring(const std::vector<T> &v) {
+std::string type2string(const std::vector<T> &v) {
 
   if (v.empty()) { return "{}"; }
 
   std::string s = "\"{";
 
   for (const auto &e : v) {
-    s += pgstring_convert_to_string(e) + ",";
+    s += type2string(e) + ",";
   }
 
   s.pop_back(); s += "}\"";
   return s;
+}
+
 }
 
 #endif
