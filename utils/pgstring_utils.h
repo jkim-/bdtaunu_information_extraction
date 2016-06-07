@@ -9,6 +9,9 @@
 
 namespace pgstring_utils {
 
+static std::stringstream float_ss_;
+static std::stringstream double_ss_;
+
 // helper classes and objects
 // --------------------------
 
@@ -51,22 +54,12 @@ class conversion_traits<float> {
     }
 
     static std::string type2string(const float &v) { 
-      ss_.str(""); ss_.clear(); ss_ << v;
-      return ss_.str();
+      float_ss_.str(""); float_ss_.clear(); 
+      float_ss_.precision(10); float_ss_ << v;
+      return float_ss_.str();
     }
 
-  private:
-    static std::stringstream ss_;
-    static std::stringstream init_ss();
 };
-
-std::stringstream conversion_traits<float>::init_ss() {
-  std::stringstream ss; ss.precision(10);
-  return ss;
-}
-
-std::stringstream 
-conversion_traits<float>::ss_ = conversion_traits<float>::init_ss();
 
 template <>
 class conversion_traits<double> {
@@ -76,24 +69,11 @@ class conversion_traits<double> {
     }
 
     static std::string type2string(const double &v) { 
-      ss_.str(""); ss_.clear(); ss_ << v;
-      return ss_.str();
+      double_ss_.str(""); double_ss_.clear();
+      double_ss_.precision(19); double_ss_ << v;
+      return double_ss_.str();
     }
-
-  private:
-    static std::stringstream ss_;
-    static std::stringstream init_ss();
 };
-
-std::stringstream 
-conversion_traits<double>::init_ss() {
-  std::stringstream ss; ss.precision(19);
-  return ss;
-}
-
-std::stringstream 
-conversion_traits<double>::ss_ = conversion_traits<double>::init_ss();
-
 
 // fuctions converting text => binary type
 // ---------------------------------------
