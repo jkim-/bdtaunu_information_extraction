@@ -1,4 +1,4 @@
-BINARIES = extract_mcevent_weights
+BINARIES = extract_mcevent_weights extract_upsilon_candidate_mclabels
 OBJECTS = MCWeightAssigner.o
 
 BDTAUNU_INFO_EXTRACT_ROOT = /Users/dchao/workspace/bdtaunu_information_extraction
@@ -29,6 +29,9 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 
 all : $(BINARIES)
+
+extract_upsilon_candidate_mclabels : $(addprefix $(BUILDDIR)/, extract_upsilon_candidate_mclabels.o $(OBJECTS))
+	$(CXX) $(LDFLAGS) $^ -o $@
 
 extract_mcevent_weights : $(addprefix $(BUILDDIR)/, extract_mcevent_weights.o $(OBJECTS))
 	$(CXX) $(LDFLAGS) $^ -o $@

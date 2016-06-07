@@ -8,12 +8,10 @@
 
 #include <boost/program_options.hpp>
 
-#include "MCWeightAssigner.h"
-
 namespace po = boost::program_options;
 namespace pu = pgstring_utils;
 
-void extract_mcevent_weights(const po::variables_map &vm);
+void extract_upsilon_candidate_mclabels(const po::variables_map &vm);
 
 int main(int argc, char **argv) {
 
@@ -30,11 +28,9 @@ int main(int argc, char **argv) {
         ("dbname", po::value<std::string>(), 
              "database name. ")
         ("table_name", po::value<std::string>(), 
-             "name of the table containing framework tuples. ")
+             "name of the truth match table. ")
         ("output_fname", po::value<std::string>(), 
              "output csv file name. ")
-        ("weight_cache_fname", po::value<std::string>(), 
-             "cached mc event weights. ")
         ("cursor_fetch_size", po::value<int>()->default_value(5000), 
              "number of rows per cursor fetch. ")
     ;
@@ -65,7 +61,7 @@ int main(int argc, char **argv) {
 
     if (vm.count("help") || !vm.count("config_file")) {
       std::cout << std::endl;
-      std::cout << "Usage: ./extract_mcevent_weights ";
+      std::cout << "Usage: ./extract_upsilon_candidate_mclabels ";
       std::cout << "[options] config_fname" << std::endl;
       std::cout << visible << "\n";
       return 0;
@@ -82,7 +78,7 @@ int main(int argc, char **argv) {
     notify(vm);
 
     // main routine
-    extract_mcevent_weights(vm);
+    extract_upsilon_candidate_mclabels(vm);
 
   } catch(std::exception& e) {
 
@@ -99,7 +95,7 @@ int main(int argc, char **argv) {
 }
 
 
-void extract_mcevent_weights(const po::variables_map &vm) {
+void extract_upsilon_candidate_mclabels(const po::variables_map &vm) {
 
   // open database connection and populate fields
   std::string dbname = vm["dbname"].as<std::string>();
@@ -110,31 +106,29 @@ void extract_mcevent_weights(const po::variables_map &vm) {
   PsqlReader psql;
   psql.open_connection("dbname="+dbname);
   psql.open_cursor(table_name, 
-      { "eid", "run", "mode_label" }, cursor_fetch_size);
-
-  // object that assigns event weights
-  std::string weight_cache_fname = vm["weight_cache_fname"].as<std::string>();
-  MCWeightAssigner mcw(weight_cache_fname);
+      { "eid", "y_match_status" }, cursor_fetch_size);
 
   // open output csv file
   std::string output_fname = vm["output_fname"].as<std::string>();
   CsvWriter csv;
   csv.open(output_fname, {
-      "eid", "weight"
+      "eid", "cidx", "is_matched"
   });
 
   // main loop to extract information 
-  int eid, run, mode_label;
+  int eid; 
+  std::vector<int> y_match_status;
   while (psql.next()) {
 
     pu::string2type(psql.get("eid"), eid);
-    pu::string2type(psql.get("run"), run);
-    pu::string2type(psql.get("mode_label"), mode_label);
+    pu::string2type(psql.get("y_match_status"), y_match_status);
 
-    csv.set("eid", pu::type2string(eid));
-    csv.set("weight", pu::type2string(mcw.get_weight(mode_label, run)));
-    csv.commit();
-
+    for (size_t i = 0; i < y_match_status.size(); ++i) {
+      csv.set("eid", pu::type2string(eid));
+      csv.set("cidx", pu::type2string(i));
+      csv.set("is_matched", pu::type2string(y_match_status[i]));
+      csv.commit();
+    }
   }
 
   // close database connection
