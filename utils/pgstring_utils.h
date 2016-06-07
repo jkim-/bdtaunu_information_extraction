@@ -30,6 +30,19 @@ class conversion_traits<int> {
 };
 
 template <>
+class conversion_traits<unsigned long> {
+  public:
+
+    static unsigned long string2type(const std::string &s) { 
+      return std::stoul(s); 
+    }
+
+    static std::string type2string(const unsigned long &v) { 
+      return std::to_string(v); 
+    }
+};
+
+template <>
 class conversion_traits<float> {
   public:
 
