@@ -1,4 +1,4 @@
-BINARIES = extract_event_weight
+BINARIES = extract_mcevent_weights
 OBJECTS = MCWeightAssigner.o
 
 BDTAUNU_INFO_EXTRACT_ROOT = /Users/dchao/workspace/bdtaunu_information_extraction
@@ -30,7 +30,7 @@ POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 
 all : $(BINARIES)
 
-extract_event_weight : $(addprefix $(BUILDDIR)/, extract_event_weight.o $(OBJECTS))
+extract_mcevent_weights : $(addprefix $(BUILDDIR)/, extract_mcevent_weights.o $(OBJECTS))
 	$(CXX) $(LDFLAGS) $^ -o $@
 
 test% : $(addprefix $(BUILDDIR)/, test%.o $(OBJECTS))

@@ -2,23 +2,30 @@
 #include <fstream>
 #include <vector>
 
-#include <pgstring_convert.h>
 #include <PsqlReader.h>
+#include <CsvWriter.h>
+#include <pgstring_utils.h>
+
+#include <boost/program_options.hpp>
 
 #include "MCWeightAssigner.h"
+
+namespace po = boost::program_options;
+namespace pu = pgstring_utils;
 
 int main() {
 
   // open output csv file
-  std::ofstream fout;
-  fout.open("event_meta.csv");
-  fout << "eid,event_weight" << std::endl;
+  CsvWriter csv;
+  csv.open("mcevent_weights_sigmc.csv", {
+      "eid", "weight"
+  });
 
   // open database connection and populate fields
   PsqlReader psql;
   psql.open_connection("dbname=testing");
   psql.open_cursor(
-      "framework_ntuples_sp1235", 
+      "framework_ntuples_sigmc", 
       { "eid", "run", "mode_label" });
 
   // object that assigns event weights
@@ -28,13 +35,13 @@ int main() {
   int eid, run, mode_label;
   while (psql.next()) {
 
-    pgstring_convert(psql.get("eid"), eid);
-    pgstring_convert(psql.get("run"), run);
-    pgstring_convert(psql.get("mode_label"), mode_label);
+    pu::string2type(psql.get("eid"), eid);
+    pu::string2type(psql.get("run"), run);
+    pu::string2type(psql.get("mode_label"), mode_label);
 
-    fout << eid << ",";
-    fout << mcw.get_weight(mode_label, run);
-    fout << std::endl;
+    csv.set("eid", pu::type2string(eid));
+    csv.set("weight", pu::type2string(mcw.get_weight(mode_label, run)));
+    csv.commit();
 
   }
 
@@ -43,7 +50,7 @@ int main() {
   psql.close_connection();
 
   // close output file
-  fout.close();
+  csv.close();
 
   return 0;
 }
