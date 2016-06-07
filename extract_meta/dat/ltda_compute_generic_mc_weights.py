@@ -11,10 +11,10 @@ xsec = { '1237' : 525.0,
 run = [ '1', '2', '3', '4', '5', '6' ]
 mc_modes = [ '998', '1005', '3429', '1235', '1237' ]
 
-mc_dataset = [ (i, j) for i in mc_modes for j in run ] 
+mc_dataset = [ (i, j) for i in mc_modes for j in run ]
 
 data_lumi = {}
-lumi_template = 'lumi --dataset AllEventsSkim-Run{0}-OnPeak-R24a1-v03 --dbname=bbkr24'
+lumi_template = 'lumi --dataset AllEventsSkim-Run{0}-OnPeak-R24a1 --dbname=bbkr24'
 lumi_patt = re.compile('^ Lumi *Processed *([1-9\.][0-9\.]*)')
 for i in run:
     lumi_cmd  = lumi_template.format(i)
@@ -29,7 +29,7 @@ for i in run:
 
 mc_nevents = []
 bbkuser_template = ('BbkUser --dbname=bbkr24 '
-                    '--dataset=SP-{0}-AllEventsSkim-Run{1}-R24a1-v03 '
+                    '--dataset=SP-{0}-AllEventsSkim-Run{1}-R24a1 '
                     'dataset events --summary')
 bbkuser_patt = re.compile('^SP-[0-9][0-9]*-.* ([0-9][0-9]*)$')
 

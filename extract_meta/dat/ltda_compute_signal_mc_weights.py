@@ -6,16 +6,16 @@ import re
 mc_modes = [ '11444', '11445', '11446', '11447' ]
 run = [ '1', '2', '3', '4', '5', '6' ]
 
-cond_p = { '11444' : 6.45e-5, 
+cond_p = { '11444' : 6.45e-5,
            '11445' : 12.04e-5,
            '11446' : 9.44e-5,
            '11447' : 24.78e-5 }
 
 
-mc_dataset = [ (i, j) for i in mc_modes for j in run ] 
+mc_dataset = [ (i, j) for i in mc_modes for j in run ]
 
 data_Nbbar = []
-lumi_template = 'lumi --dataset AllEventsSkim-Run{0}-OnPeak-R24a1-v03 --dbname=bbkr24'
+lumi_template = 'lumi --dataset AllEventsSkim-Run{0}-OnPeak-R24a1 --dbname=bbkr24'
 lumi_patt = re.compile('^Total *([0-9\.][0-9\.]*) \|')
 for i in run:
     lumi_cmd  = lumi_template.format(i)
@@ -28,7 +28,7 @@ for i in run:
             data_Nbbar.append(float(match.group(1)))
 
 N_bbar = sum(data_Nbbar)
-print 
+print
 print 'Found {0} BBbar in the data.\n'.format(N_bbar)
 
 mc_nevents = {}
@@ -48,11 +48,11 @@ for m in mc_modes:
         for line in bbkuser_output.strip().split('\n'):
             match = bbkuser_patt.search(line)
             if match:
-                n_events += int(match.group(1)) 
+                n_events += int(match.group(1))
 
     mc_nevents[m] = n_events
 
-print 
+print
 print 'Found the following event counts in each mc mode:'
 print mc_nevents
 print
