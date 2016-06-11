@@ -1,6 +1,6 @@
 BEGIN;
 
-CREATE TABLE events_sigmc (
+CREATE TABLE event_level_features_sigmc (
   eid integer, 
   ny integer, 
   ntracks integer, 
@@ -44,15 +44,15 @@ CREATE TABLE upsilon_candidates_sigmc (
   sig_h_mupid integer
 );
 
-\copy events_sigmc FROM 'events_sigmc.csv' WITH CSV HEADER;
+\copy event_level_features_sigmc FROM 'event_level_features_sigmc.csv' WITH CSV HEADER;
 \copy upsilon_candidates_sigmc FROM 'upsilon_candidates_sigmc.csv' WITH CSV HEADER;
 
 DROP MATERIALIZED VIEW serializer_inputs_sigmc;
 
-CREATE INDEX ON events_sigmc (eid);
+CREATE INDEX ON event_level_features_sigmc (eid);
 CREATE INDEX ON upsilon_candidates_sigmc (eid, cidx);
 
 COMMIT;
 
-VACUUM ANALYZE events_sigmc;
+VACUUM ANALYZE event_level_features_sigmc;
 VACUUM ANALYZE upsilon_candidates_sigmc;

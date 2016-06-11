@@ -1,6 +1,6 @@
 BEGIN;
 
-CREATE TABLE events_data (
+CREATE TABLE event_level_features_data (
   eid integer, 
   ny integer, 
   ntracks integer, 
@@ -44,15 +44,15 @@ CREATE TABLE upsilon_candidates_data (
   sig_h_mupid integer
 );
 
-\copy events_data FROM 'events_data.csv' WITH CSV HEADER;
+\copy event_level_features_data FROM 'event_level_features_data.csv' WITH CSV HEADER;
 \copy upsilon_candidates_data FROM 'upsilon_candidates_data.csv' WITH CSV HEADER;
 
 DROP MATERIALIZED VIEW serializer_inputs_data;
 
-CREATE INDEX ON events_data (eid);
+CREATE INDEX ON event_level_features_data (eid);
 CREATE INDEX ON upsilon_candidates_data (eid, cidx);
 
 COMMIT;
 
-VACUUM ANALYZE events_data;
+VACUUM ANALYZE event_level_features_data;
 VACUUM ANALYZE upsilon_candidates_data;
