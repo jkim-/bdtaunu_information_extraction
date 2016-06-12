@@ -2,7 +2,7 @@ BEGIN;
 
 CREATE TABLE event_weights_sigmc (
   eid bigint,
-  weight real
+  weight numeric
 );
 
 \copy event_weights_sigmc FROM 'mcevent_weights_sigmc.csv' WITH CSV HEADER;
