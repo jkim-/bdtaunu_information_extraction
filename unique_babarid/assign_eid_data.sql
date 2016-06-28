@@ -12,3 +12,5 @@ WHERE NOT EXISTS (
 
 CREATE INDEX ON unique_eid_data (platform, partition, upperid, lowerid);
 CREATE INDEX ON unique_eid_data (eid);
+
+VACUUM ANALYZE unique_eid_data;

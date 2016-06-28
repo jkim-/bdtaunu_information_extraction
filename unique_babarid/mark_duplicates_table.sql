@@ -28,3 +28,8 @@ HAVING count(*) > 1
 ) AS sub
 INNER JOIN babarid 
 USING (platform, partition, upperid, lowerid);
+
+CREATE INDEX ON duplicate_records (eid);
+CREATE INDEX ON duplicate_records (platform, partition, upperid, lowerid);
+
+VACUUM ANALYZE duplicate_records;
