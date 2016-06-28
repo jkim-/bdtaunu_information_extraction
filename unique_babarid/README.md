@@ -15,5 +15,4 @@ unique BaBar ID's.
 + `unique_eid_[data|generic|sigmc]` are the tables containing eid's and BaBarID's of valid (i.e. unique) 
 records. We actually see that all duplicate records come from the generic MC.
 
-+ `example_download.sql` is a script showing an example of how to select the valid records by eid to
-download the data.   
++ The example directory contains scripts to show how to use the `unique_eid` tables. 
