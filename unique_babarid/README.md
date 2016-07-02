@@ -2,17 +2,13 @@ Select unique records
 ---
 
 These scripts determine the uniqueness of each records in terms of their "BaBar ID", which is a set
-of 4 integers: platform, partition, upperID, and lowerID.  These scripts can be run immediately
-following data insertion using root2postgres.
+of 4 integers: platform, partition, upperID, and lowerID. 
 
-By construction eid's are unique but the BaBar ID's are known to have duplicates.  Since the number
-of such records is small (<300), we will proceed by excluding such records when performing the
-analysis.  
+By construction, eid's are unique but the BaBar ID's are not. However, it turns out that
+the number of records whose Babar ID non-unique is very small (<300). 
 
-+ `duplicate_records` is the table containing eid's and Babar ID's of records that do **not** have
-unique BaBar ID's.
++ `duplicate_records` is the table containing eid's and Babar ID's of records 
+  whose Babar ID is not unique. 
 
 + `unique_eid_[data|generic|sigmc]` are the tables containing eid's and BaBarID's of valid (i.e. unique) 
 records. We actually see that all duplicate records come from the generic MC.
-
-+ The example directory contains scripts to show how to use the `unique_eid` tables. 
