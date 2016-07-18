@@ -18,18 +18,11 @@ char const* const McBTypeCodeStr[] = {
     0
 };
 
-/*enum class McBTypeCode { 
-  NoB = 0,
-  Dtau,
-  Dstartau,
-  Dl,
-  Dstarl, 
-  Dstarstar_res,
-  Dstarstar_nonres,
-  SL,
-  Had,
-  null
-};*/
+inline std::string mcbtype2string(McBTypeCode c) {
+  int i = static_cast<int>(c);
+  int n = static_cast<int>(McBTypeCode::null);
+  return (i >= 0 && i < n) ? std::string(McBTypeCodeStr[i]) : "null";
+}
 
 class McBTypeDict {
 

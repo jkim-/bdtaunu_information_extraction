@@ -60,8 +60,8 @@ int main() {
     curator.curate(g, summary);
     analyzer.analyze(g, summary);
 
-    fout << static_cast<int>(analyzer.b1_mctype()) << ",";
-    fout << static_cast<int>(analyzer.b2_mctype()) << std::endl;
+    fout << analyzer.b1_mctype_string() << ",";
+    fout << analyzer.b2_mctype_string() << std::endl;
 
     ++i;
   }

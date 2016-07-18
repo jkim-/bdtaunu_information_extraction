@@ -24,6 +24,8 @@ class McBTypeAnalyzer {
 
     McBTypeCode b1_mctype() const { return b1_mctype_; }
     McBTypeCode b2_mctype() const { return b2_mctype_; }
+    std::string b1_mctype_string() const { return mcbtype2string(b1_mctype_); }
+    std::string b2_mctype_string() const { return mcbtype2string(b2_mctype_); }
 
   private:
     void clear_cache();

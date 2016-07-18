@@ -1,7 +1,7 @@
 # directory configuration
 # -----------------------
 
-BINARIES = test1
+BINARIES = extract_mcbtypes
 
 # objects to package into the shared library
 OBJECTS = McLundGraph.o McDecayModeCurator.o \
@@ -44,6 +44,9 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 
 all : $(BINARIES)
+
+extract_mcbtypes : $(addprefix $(BUILDDIR)/, extract_mcbtypes.o $(OBJECTS))
+	$(CXX) $(LDFLAGS) $^ -o $@
 
 test% : $(addprefix $(BUILDDIR)/, test%.o $(OBJECTS))
 	$(CXX) $(LDFLAGS) $^ -o $@
