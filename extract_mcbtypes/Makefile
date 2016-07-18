@@ -10,9 +10,9 @@ OBJECTS = McLundGraph.o McDecayModeCurator.o \
 # external dependencies
 # ---------------------
 
-FF_REWEIGHT_ROOT = /home/dchao/workspace/bdtaunu_reweighting
-UTILS_INCDIR = $(FF_REWEIGHT_ROOT)/utils
-UTILS_LIBDIR = $(FF_REWEIGHT_ROOT)/utils
+BDTAUNU_INFO_EXTRACT_ROOT = /home/dchao/workspace/bdtaunu_information_extraction
+UTILS_INCDIR = $(BDTAUNU_INFO_EXTRACT_ROOT)/utils
+UTILS_LIBDIR = $(BDTAUNU_INFO_EXTRACT_ROOT)/utils
 
 BOOST_ROOT = /usr/local/boost_1_59_0
 BOOST_INCDIR = $(BOOST_ROOT)
@@ -25,7 +25,7 @@ LIBPQ_LIBDIR = $(LIBPQ_ROOT)/lib
 
 INCFLAGS += -I$(UTILS_INCDIR) -I$(BOOST_INCDIR) -I$(LIBPQ_INCDIR)
 LDFLAGS += -L$(UTILS_LIBDIR) -L$(BOOST_LIBDIR) -L$(LIBPQ_LIBDIR) \
-          -Wl,-rpath,$(UTILS_LIBDIR) -lreweight_utils \
+          -Wl,-rpath,$(UTILS_LIBDIR) -lbdtaunu_info_extract_utils \
           -Wl,-rpath,$(BOOST_LIBDIR) -lboost_program_options \
           -Wl,-rpath,$(LIBPQ_LIBDIR) -lpq
 
@@ -44,9 +44,6 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 
 all : $(BINARIES)
-
-brf_reweight : $(addprefix $(BUILDDIR)/, brf_reweight.o $(OBJECTS))
-	$(CXX) $(LDFLAGS) $^ -o $@
 
 test% : $(addprefix $(BUILDDIR)/, test%.o $(OBJECTS))
 	$(CXX) $(LDFLAGS) $^ -o $@

@@ -4,7 +4,21 @@
 #include <vector>
 #include <trie.h>
 
-enum class McBTypeCode { 
+enum class McBTypeCode {
+#   define X(a) a,
+#   include "McBTypeCode.def"
+#   undef X
+    null
+};
+
+char const* const McBTypeCodeStr[] = {
+#   define X(a) #a,
+#   include "McBTypeCode.def"
+#   undef X
+    0
+};
+
+/*enum class McBTypeCode { 
   NoB = 0,
   Dtau,
   Dstartau,
@@ -15,7 +29,7 @@ enum class McBTypeCode {
   SL,
   Had,
   null
-};
+};*/
 
 class McBTypeDict {
 

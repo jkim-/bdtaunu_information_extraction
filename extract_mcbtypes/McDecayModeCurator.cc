@@ -4,6 +4,7 @@
 
 #include <boost/property_map/property_map.hpp>
 
+#include "extract_mcbtypes_constants.h"
 #include "McDecayModeCurator.h"
 
 McDecayModeCurator::McDecayModeCurator() {}
