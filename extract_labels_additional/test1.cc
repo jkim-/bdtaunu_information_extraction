@@ -9,7 +9,7 @@
 
 #include "McLundGraph.h"
 #include "McDecayModeCurator.h"
-#include "EventTypeLabeler.h"
+#include "McBTypeAnalyzer.h"
 
 namespace pu = pgstring_utils;
 
@@ -36,10 +36,10 @@ int main() {
   McLundGraphFactory graph_factory;
   McDecayModeCurator curator;
   McDecayModeSummary summary;
-  EventTypeLabeler labeler;
+  McBTypeAnalyzer analyzer;
 
   std::ofstream fout("test.csv");
-  fout << "evttypedss,b1_mctype,b2_mctype" << std::endl;
+  fout << "b1_mctype,b2_mctype" << std::endl;
 
   // main loop
   const int max_records = 1000;
@@ -58,11 +58,10 @@ int main() {
         mc_from_vertices, mc_to_vertices, mc_lund_id);
 
     curator.curate(g, summary);
-    labeler.analyze(g, summary);
+    analyzer.analyze(g, summary);
 
-    fout << static_cast<int>(labeler.evttypedss_code()) << ",";
-    fout << static_cast<int>(labeler.b1_mctype()) << ",";
-    fout << static_cast<int>(labeler.b2_mctype()) << std::endl;
+    fout << static_cast<int>(analyzer.b1_mctype()) << ",";
+    fout << static_cast<int>(analyzer.b2_mctype()) << std::endl;
 
     ++i;
   }

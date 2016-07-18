@@ -5,7 +5,7 @@ BINARIES = test1
 
 # objects to package into the shared library
 OBJECTS = McLundGraph.o McDecayModeCurator.o \
-					McBTypeDict.o EventTypeLabeler.o
+					McBTypeDict.o McBTypeAnalyzer.o
 
 # external dependencies
 # ---------------------

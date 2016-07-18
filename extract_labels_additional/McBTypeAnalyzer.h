@@ -1,26 +1,14 @@
-#ifndef __EVENTTYPELABELER_H__
-#define __EVENTTYPELABELER_H__
+#ifndef __MCBTYPEANALYZER_H__
+#define __MCBTYPEANALYZER_H__
 
 #include <vector>
 #include <string>
 
 #include "McLundGraph.h"
 #include "McDecayModeCurator.h"
-
 #include "McBTypeDict.h"
 
-enum class EventTypeDssCode {
-  Dtau = 1,
-  Dstartau = 2,
-  DssSL = 3,
-  SLHad = 4,
-  Cont = 5,
-  null
-};
-
-EventTypeDssCode decide_evttypedss(McBTypeCode, McBTypeCode);
-
-class EventTypeLabeler {
+class McBTypeAnalyzer {
 
   public:
     using Graph = McLundGraph;
@@ -29,12 +17,11 @@ class EventTypeLabeler {
 
   public:
 
-    EventTypeLabeler();
-    ~EventTypeLabeler();
+    McBTypeAnalyzer();
+    ~McBTypeAnalyzer();
 
     void analyze(const Graph &g, const McDecayModeSummary &summary);
 
-    EventTypeDssCode evttypedss_code() const { return evttypedss_code_; }
     McBTypeCode b1_mctype() const { return b1_mctype_; }
     McBTypeCode b2_mctype() const { return b2_mctype_; }
 
@@ -47,7 +34,6 @@ class EventTypeLabeler {
   private:
     McBTypeDict mcbtype_dict_;
 
-    EventTypeDssCode evttypedss_code_;
     McBTypeCode b1_mctype_;
     McBTypeCode b2_mctype_;
 
