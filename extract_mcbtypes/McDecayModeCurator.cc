@@ -4,8 +4,6 @@
 
 #include <boost/property_map/property_map.hpp>
 
-#include <ff_reweight_constants.h>
-
 #include "McDecayModeCurator.h"
 
 McDecayModeCurator::McDecayModeCurator() {}

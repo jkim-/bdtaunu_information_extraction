@@ -1,5 +1,3 @@
-#include <ff_reweight_constants.h>
-
 #include "McBTypeAnalyzer.h"
 
 McBTypeAnalyzer::McBTypeAnalyzer() :mcbtype_dict_() {
