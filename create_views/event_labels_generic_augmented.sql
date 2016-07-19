@@ -7,9 +7,7 @@ SELECT * FROM bmctypes_sp1237;
 CREATE TEMPORARY TABLE grouped_dss_evttype AS 
 SELECT 
   eid, 
-  CASE WHEN b1_mctype='Dtau' OR b2_mctype='Dtau' THEN 1
-       WHEN b1_mctype='Dstartau' OR b2_mctype='Dstartau' THEN 2
-       WHEN 
+  CASE WHEN 
         b1_mctype='Dstarstar_res' OR b2_mctype='Dstarstar_res' OR
         b1_mctype='Dstarstar_nonres' OR b2_mctype='Dstarstar_nonres' THEN 3
        ELSE 4
