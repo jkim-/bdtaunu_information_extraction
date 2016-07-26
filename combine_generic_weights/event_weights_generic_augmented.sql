@@ -28,6 +28,7 @@ SELECT
   weight AS lumi_weight,
   COALESCE(brf_correction_weight, 1.0) AS brf_correction_weight,
   COALESCE(cln_weight, 1.0) AS cln_weight,
+  COALESCE(linearq2_weight, 1.0) AS linearq2_weight,
   COALESCE(llswb1_weight, 1.0) AS llswb1_weight,
   COALESCE(llswb2_weight, 1.0) AS llswb2_weight,
   COALESCE(b1_brf_mode, 'null') AS b1_brf_mode,
@@ -41,3 +42,5 @@ USING (eid);
 CREATE INDEX ON event_weights_generic_augmented (eid);
 
 COMMIT;
+
+VACCUM ANALYZE event_weights_generic_augmented;
