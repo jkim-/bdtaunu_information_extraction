@@ -46,13 +46,19 @@ SELECT
   COALESCE(b1_brf_mode, 'null') AS b1_brf_mode,
   COALESCE(b2_brf_mode, 'null') AS b2_brf_mode,
 
+  COALESCE(comb_logre_weight, 1.0) AS sideband_comb_logre_weight,
+
   COALESCE(logre_density_weight, 1.0) AS continuum_logre_density_weight,
   COALESCE(logre_normalization_weight, 1.0) AS continuum_logre_normalization_weight,
   COALESCE(gbdt300_density_weight, 1.0) AS continuum_gbdt300_density_weight,
   COALESCE(gbdt300_normalization_weight, 1.0) AS continuum_gbdt300_normalization_weight
 
 FROM 
-  (event_weights_generic LEFT OUTER JOIN aux_weights_bbar USING (eid)) 
+  ( 
+    (event_weights_generic LEFT OUTER JOIN aux_weights_bbar USING (eid)) 
+    LEFT OUTER JOIN 
+    sideband_scaled_weights USING (eid)
+  )
   LEFT OUTER JOIN
   continuum_offpeak_scaled_weights
   USING (eid);
